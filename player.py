@@ -1,5 +1,6 @@
 import pygame
 from graphics import load_image, cut_image_one, AnimatedSprite
+from level import *
 
 
 class Player(pygame.sprite.Sprite):

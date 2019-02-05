@@ -87,3 +87,14 @@ def cut_level(image, rows, columns, chosen=False):
     return frames
 
 
+class Rectangle:
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.left = x
+        self.right = x + width
+        self.top = y
+        self.bottom = y + height
+

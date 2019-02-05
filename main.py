@@ -1,10 +1,11 @@
 import pygame
 from menus import *
 from player import *
-from map import *
+from level import *
 
+TILESIZE = 32
 FPS = 60
-resolution = width, height = 640, 480
+resolution = WIDTH, HEIGHT = 640, 480
 
 pygame.init()
 screen = pygame.display.set_mode(resolution)  # , pygame.FULLSCREEN
@@ -16,10 +17,6 @@ main_menu_res = main_menu(screen)
 
 maap = Map(create_test_map())
 
-sample_sprite = pygame.sprite.Sprite()
-sample_sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
-sample_sprite.rect = sample_sprite.image.get_rect()
-
 running = True
 pygame.mixer.music.load('data/music/gestation.mp3')
 pygame.mixer.music.play(-1)
@@ -30,8 +27,10 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             pressed = pygame.key.get_pressed()
-            if pressed[pygame.K_RIGHT] and pressed[pygame.K_LEFT]:
-                player.stop_running()
+            if pressed[pygame.K_F4] and pressed[pygame.K_LALT]:
+                exit()
+            # if pressed[pygame.K_RIGHT] and pressed[pygame.K_LEFT]:
+            #     player.stop_running()
             if pressed[pygame.K_UP] and pressed[pygame.K_DOWN]:
                 player.look = 'fwd'
             elif pressed[pygame.K_UP]:
@@ -45,9 +44,10 @@ while running:
             elif event.key == pygame.K_z:
                 player.start_jump()
         if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT:
+            pressed = pygame.key.get_pressed()
+            if event.key == pygame.K_LEFT and not pressed[pygame.K_RIGHT]:
                 player.stop_running()
-            elif event.key == pygame.K_RIGHT:
+            elif event.key == pygame.K_RIGHT and not pressed[pygame.K_LEFT]:
                 player.stop_running()
             elif event.key == pygame.K_UP:
                 player.look = 'fwd'
@@ -55,13 +55,11 @@ while running:
                 player.look = 'fwd'
             elif event.key == pygame.K_z:
                 player.stop_jump()
-    all_sprites.draw(screen)
     all_sprites.update()
-    player_group.draw(screen)
+    all_sprites.draw(screen)
     player_group.update()
+    player_group.draw(screen)
     maap.update()
     maap.draw(screen)
-    # level.draw()
-    # player.update()
     clock.tick(FPS)
     pygame.display.flip()
