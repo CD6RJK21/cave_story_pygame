@@ -1,0 +1,72 @@
+import pygame
+import os
+
+
+class AnimatedSprite(pygame.sprite.Sprite):
+    def __init__(self, sprite_group, sheet, columns, rows, x, y, update_time, chosen_sprites=False, one_image=False):
+        super().__init__(sprite_group)
+        self.one_image = one_image
+        self.chosen_sprites = chosen_sprites
+        self.update_time = update_time
+        self.time = 0
+        self.frames = []
+        self.cut_sheet(sheet, columns, rows)
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
+        self.rect = self.rect.move(x, y)
+
+    def cut_sheet(self, sheet, columns, rows):
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                self.frames.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
+        if self.chosen_sprites is not False:
+            self.frames_chosen = []
+            for i in self.chosen_sprites:
+                self.frames_chosen.append(self.frames[i[0] * columns + i[1]])
+            self.frames = self.frames_chosen[:]
+
+    def update(self):
+        if not self.one_image:
+            self.time += 1
+            if self.time >= self.update_time:
+                self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+                self.image = self.frames[self.cur_frame]
+                self.time = 0
+
+
+# class ChosenAnimatedSprite(AnimatedSprite):
+#     def __init__(self, sprite_group, sheet, columns, rows, x, y, update_time, chosen_sprites):  # e.g. chosen_sprites:
+#         super().__init__(sprite_group, sheet, columns, rows, x, y, update_time)  # [(row, column), ...]
+#         self.chosen_sprites = chosen_sprites
+#         self.frames_chosen = []
+#
+#         self.frames
+#
+#     def update(self):
+#         self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+#         self.image = self.frames[self.cur_frame]
+
+
+def load_image(name, colorkey=None):
+    fullname = os.path.join('data', name)
+    try:
+        image = pygame.image.load(fullname)
+    except pygame.error as message:
+        print('Cannot load image:', name)
+        raise SystemExit(message)
+    image = image.convert_alpha()
+    if colorkey is not None:
+        if colorkey is -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey)
+    return image
+
+
+def cut_image_one(image, pos1, pos2):
+    image = image.subsurface(pygame.Rect(pos1, (pos2[0] - pos1[0], pos2[1] - pos1[1])))
+    return image
+
