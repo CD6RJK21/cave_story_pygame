@@ -27,9 +27,11 @@ class Player(pygame.sprite.Sprite):
         self.cur_frame = 0
         self.player_image = load_image('MyChar.png')
         self.player_group = player_group
-        self.set_sprite('staying_left')
+        self.motion = 'staying'
         self.direction = 'left'
         self.look = 'fwd'
+        self.last_state = 'staying_left_fwd'
+        self.set_sprite('staying_left_fwd')
         self.rect = self.image.get_rect()
         self.rect.move(pos[0], pos[1])
 
@@ -50,6 +52,7 @@ class Player(pygame.sprite.Sprite):
         return frames
 
     def set_sprite(self, state):
+        self.last_state = '_'.join([self.get_sprite_state(), self.direction, self.look])
         sprites = {'staying_left_fwd': self.cut_sheet(self.player_image, 11, 4, [[0, 0]]),
                    'staying_left_up': self.cut_sheet(self.player_image, 11, 4, [[0, 3]]),
                    'running_left_fwd': self.cut_sheet(self.player_image, 11, 4, [[0, 2], [0, 0], [0, 1], [0, 0]]),
@@ -86,18 +89,20 @@ class Player(pygame.sprite.Sprite):
         return motion
 
     def set_current_sprite_state(self):
+        if self.last_state == '_'.join([self.get_sprite_state(), self.direction, self.look]):
+            return
         if self.look == 'down' and self.on_ground:
             self.set_sprite('_'.join([self.get_sprite_state(), self.direction, 'fwd']))
         else:
             self.set_sprite('_'.join([self.get_sprite_state(), self.direction, self.look]))
 
     def start_running_left(self):
-        self.set_sprite('running_left')
+        self.motion = 'running'
         self.direction = 'left'
         self.acceleration = -self.walking_acceleration
 
     def start_running_right(self):
-        self.set_sprite('running_right')
+        self.motion = 'running'
         self.direction = 'right'
         self.acceleration = self.walking_acceleration
 
@@ -128,12 +133,14 @@ class Player(pygame.sprite.Sprite):
         # while self.speed_x > 0:
         #     self.speed_x -= self.slowdown
         self.acceleration = 0
-        if self.direction == 'left':
-            self.set_sprite('staying_left')
-        elif self.direction == 'right':
-            self.set_sprite('staying_right')
+        self.motion = 'staying'
+        # if self.direction == 'left':
+        #     self.set_sprite('staying_left')
+        # elif self.direction == 'right':
+        #     self.set_sprite('staying_right')
 
     def update(self):
+        self.set_current_sprite_state()
         self.rect.x += self.speed_x
         self.speed_x += self.acceleration  # TODO: fix player walking stops when both arrows are pressed
         # if (self.speed_x < self.max_speed_x and (self.speed_x > 0)) or\

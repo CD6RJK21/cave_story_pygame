@@ -43,6 +43,10 @@ while running:
                 player.stop_running()
             elif event.key == pygame.K_RIGHT:
                 player.stop_running()
+            elif event.key == pygame.K_UP:
+                player.look = 'fwd'
+            elif event.key == pygame.K_DOWN:
+                player.look = 'fwd'
             elif event.key == pygame.K_z:
                 player.stop_jump()
     all_sprites.draw(screen)
