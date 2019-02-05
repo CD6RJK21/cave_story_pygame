@@ -3,9 +3,8 @@ import os
 
 
 class AnimatedSprite(pygame.sprite.Sprite):
-    def __init__(self, sprite_group, sheet, columns, rows, x, y, update_time, chosen_sprites=False, one_image=False):
+    def __init__(self, sprite_group, sheet, columns, rows, x, y, update_time, chosen_sprites=False):
         super().__init__(sprite_group)
-        self.one_image = one_image
         self.chosen_sprites = chosen_sprites
         self.update_time = update_time
         self.time = 0
@@ -30,7 +29,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
             self.frames = self.frames_chosen[:]
 
     def update(self):
-        if not self.one_image:
+        if len(self.frames) != 1:
             self.time += 1
             if self.time >= self.update_time:
                 self.cur_frame = (self.cur_frame + 1) % len(self.frames)
@@ -69,4 +68,22 @@ def load_image(name, colorkey=None):
 def cut_image_one(image, pos1, pos2):
     image = image.subsurface(pygame.Rect(pos1, (pos2[0] - pos1[0], pos2[1] - pos1[1])))
     return image
+
+
+def cut_level(image, rows, columns, chosen=False):
+    frames = []
+    rect = pygame.Rect(0, 0, image.get_width() // columns,
+                       image.get_height() // rows)
+    for j in range(rows):
+        for i in range(columns):
+            frame_location = (rect.w * i, rect.h * j)
+            frames.append(image.subsurface(pygame.Rect(
+                frame_location, rect.size)))
+    if chosen is not False:
+        frames_chosen = []
+        for i in chosen:
+            frames_chosen.append(frames[i[0] * columns + i[1]])
+        frames = frames_chosen[:]
+    return frames
+
 

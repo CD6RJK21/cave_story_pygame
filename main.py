@@ -1,6 +1,7 @@
 import pygame
-from menus import main_menu
-from player import Player
+from menus import *
+from player import *
+from map import *
 
 FPS = 60
 resolution = width, height = 640, 480
@@ -13,6 +14,11 @@ player_group = pygame.sprite.Group()
 player = Player(player_group, (50, 50))
 main_menu_res = main_menu(screen)
 
+maap = Map(create_test_map())
+
+sample_sprite = pygame.sprite.Sprite()
+sample_sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
+sample_sprite.rect = sample_sprite.image.get_rect()
 
 running = True
 pygame.mixer.music.load('data/music/gestation.mp3')
@@ -53,6 +59,9 @@ while running:
     all_sprites.update()
     player_group.draw(screen)
     player_group.update()
+    maap.update()
+    maap.draw(screen)
+    # level.draw()
     # player.update()
     clock.tick(FPS)
     pygame.display.flip()

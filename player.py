@@ -53,7 +53,8 @@ class Player(pygame.sprite.Sprite):
 
     def set_sprite(self, state):
         self.last_state = '_'.join([self.get_sprite_state(), self.direction, self.look])
-        sprites = {'staying_left_fwd': self.cut_sheet(self.player_image, 11, 4, [[0, 0]]),
+        sprites = {'staying_left_back': self.cut_sheet(self.player_image, 11, 4, [[0, 7]]),
+                   'staying_left_fwd': self.cut_sheet(self.player_image, 11, 4, [[0, 0]]),
                    'staying_left_up': self.cut_sheet(self.player_image, 11, 4, [[0, 3]]),
                    'running_left_fwd': self.cut_sheet(self.player_image, 11, 4, [[0, 2], [0, 0], [0, 1], [0, 0]]),
                    'running_left_up': self.cut_sheet(self.player_image, 11, 4, [[0, 5], [0, 3], [0, 4], [0, 3]]),
@@ -63,6 +64,7 @@ class Player(pygame.sprite.Sprite):
                    'falling_left_fwd': self.cut_sheet(self.player_image, 11, 4, [[0, 1]]),
                    'falling_left_up': self.cut_sheet(self.player_image, 11, 4, [[0, 4]]),
                    'falling_left_down': self.cut_sheet(self.player_image, 11, 4, [[0, 6]]),
+                   'staying_right_back': self.cut_sheet(self.player_image, 11, 4, [[1, 7]]),
                    'staying_right_fwd': self.cut_sheet(self.player_image, 11, 4, [[1, 0]]),
                    'staying_right_up': self.cut_sheet(self.player_image, 11, 4, [[1, 3]]),
                    'running_right_fwd': self.cut_sheet(self.player_image, 11, 4, [[1, 2], [1, 0], [1, 1], [1, 0]]),
@@ -74,9 +76,10 @@ class Player(pygame.sprite.Sprite):
                    'falling_right_up': self.cut_sheet(self.player_image, 11, 4, [[1, 4]]),
                    'falling_right_down': self.cut_sheet(self.player_image, 11, 4, [[1, 6]])
                    }
-        self.look = state.split('_')[2]
-        self.direction = state.split('_')[1]
-        self.motion = state.split('_')[0]
+        state1 = state.split('_')
+        self.look = state1[2]
+        self.direction = state1[1]
+        self.motion = state1[0]
         self.frames = sprites[state]
         self.state = state
         self.image = self.frames[0]
@@ -89,12 +92,15 @@ class Player(pygame.sprite.Sprite):
         return motion
 
     def set_current_sprite_state(self):
+        self.motion = self.get_sprite_state()
         if self.last_state == '_'.join([self.get_sprite_state(), self.direction, self.look]):
             return
-        if self.look == 'down' and self.on_ground:
-            self.set_sprite('_'.join([self.get_sprite_state(), self.direction, 'fwd']))
+        if self.look == 'down' and (self.motion == 'staying'):
+            self.set_sprite('_'.join([self.motion, self.direction, 'back']))
+        elif self.look == 'down' and self.on_ground:
+            self.set_sprite('_'.join([self.motion, self.direction, 'fwd']))
         else:
-            self.set_sprite('_'.join([self.get_sprite_state(), self.direction, self.look]))
+            self.set_sprite('_'.join([self.motion, self.direction, self.look]))
 
     def start_running_left(self):
         self.motion = 'running'
@@ -164,10 +170,10 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.speed_y
         if not self.jump_active:
             self.speed_y = min(self.speed_y + self.gravity, self.max_speed_y)
-        if self.rect.y >= 200:  # TODO: remove this temporary solution
-            self.rect.y = 200
+        if self.rect.y >= 192 - self.rect.height:  # TODO: remove this temporary solution
+            self.rect.y = 192 - self.rect.height
             self.speed_y = 0
-        self.on_ground = self.rect.y == 200
+        self.on_ground = self.rect.y == 192 - self.rect.height
 
         if len(self.frames) > 1:
             self.time += 1
