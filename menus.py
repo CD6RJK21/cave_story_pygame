@@ -64,7 +64,7 @@ def main_menu(screen):
     pygame.mixer.music.stop()
     if active_button == 'new':
         return 'new'
-    else:
+    elif active_button == 'load':
         return 'load'
 
 

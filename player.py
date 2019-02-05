@@ -159,8 +159,8 @@ class Player(pygame.sprite.Sprite):
             self.speed_x = max(self.speed_x, -self.max_speed_x)
         else:
             if self.speed_x < 0:
-                self.speed_x *= self.slowdown
-                if self.speed_x > -0.5:
+                self.speed_x *= self.slowdown * 1
+                if self.speed_x > -0.4:
                     self.speed_x = 0
             # if self.speed_x < 0:
             #     self.speed_x *= self.slowdown * 0.13

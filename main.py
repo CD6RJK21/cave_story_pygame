@@ -28,7 +28,7 @@ while running:
         if event.type == pygame.KEYDOWN:
             pressed = pygame.key.get_pressed()
             if pressed[pygame.K_F4] and pressed[pygame.K_LALT]:
-                exit()
+                exit()  # TODO: make exit dialog window
             # if pressed[pygame.K_RIGHT] and pressed[pygame.K_LEFT]:
             #     player.stop_running()
             if pressed[pygame.K_UP] and pressed[pygame.K_DOWN]:
