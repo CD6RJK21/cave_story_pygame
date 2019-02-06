@@ -14,20 +14,19 @@ class Player(pygame.sprite.Sprite):
         self.rectangle_x = Rectangle(6, 10, 20, 12)
         self.rectangle_y = Rectangle(10, 2, 12, 30)
 
-        self.walking_acceleration = 0.3
+        self.air_acceleration = 0.08680555555555554  # or it eq to jump gravity
+        self.walking_acceleration = 0.25
         self.acceleration = 0
-        self.slowdown = 0.91
-        self.max_speed_x = 4
+        self.friction = 0.13834635277777776
+        self.max_speed_x = 3
         self.speed_x = 0
 
-        self.max_speed_y = 4
+        self.jump_gravity = 0.1
+        self.max_speed_y = 5
         self.gravity = 0.23
         self.speed_y = 0
-        self.jump_time = 120
         self.jump_speed = 4
         self.on_ground = False
-        self.remaining_time = 0
-        self.elapsed_time = 0
         self.jump_active = False
 
         self.update_time = 8
@@ -78,19 +77,26 @@ class Player(pygame.sprite.Sprite):
 
     def updatex(self, maap):
         # Speed update
-        self.speed_x += self.acceleration
+        acceleration = 0
+        if self.acceleration < 0:
+            acceleration = -self.walking_acceleration if self.on_ground else -self.air_acceleration
+        elif self.acceleration > 0:
+            acceleration = self.walking_acceleration if self.on_ground else self.air_acceleration
+        self.speed_x += acceleration
         if self.acceleration > 0:
             self.speed_x = min(self.speed_x, self.max_speed_x)
         elif self.acceleration < 0:
-            self.speed_x = max(self.speed_x, -self.max_speed_x)
+            self.speed_x = max(self.speed_x, -self.max_speed_x + 0.1)
+
         else:
-            if self.speed_x < 0:
-                self.speed_x *= self.slowdown * 1
-                if self.speed_x > -0.4:
-                    self.speed_x = 0
+            # if self.speed_x < 0:
+            #     self.speed_x *= self.slowdown * 1
+            #     if self.speed_x > -0.4:
+            #         self.speed_x = 0
             # if self.speed_x < 0:
             #     self.speed_x *= self.slowdown * 0.13
-            self.speed_x *= self.slowdown
+            self.speed_x = max(0.0, self.speed_x - self.friction) \
+                if self.speed_x > 0 else min(0.0, self.speed_x + self.friction + 0.08)
 
         delta = self.speed_x
         # Running to right
@@ -120,11 +126,8 @@ class Player(pygame.sprite.Sprite):
 
     def updatey(self, maap):
         # Speed update
-        self.update_jump()
-        self.elapsed_time += 1
-
-        if not self.jump_active:
-            self.speed_y = min(self.speed_y + self.gravity, self.max_speed_y)
+        gravity = self.jump_gravity if self.jump_active and self.speed_y < 0 else self.gravity
+        self.speed_y = min(self.speed_y + gravity, self.max_speed_y)
 
         delta = self.speed_y
         if delta > 0:
@@ -230,33 +233,20 @@ class Player(pygame.sprite.Sprite):
     def start_running_left(self):
         self.motion = 'running'
         self.direction = 'left'
-        self.acceleration = -self.walking_acceleration
+        self.acceleration = -1
 
     def start_running_right(self):
         self.motion = 'running'
         self.direction = 'right'
-        self.acceleration = self.walking_acceleration
-
-    def reset_jump(self):
-        self.remaining_time = self.jump_time
-        self.jump_active = self.remaining_time > 0
-        self.elapsed_time = 0
-
-    def update_jump(self):
-        if self.jump_active:
-            self.remaining_time -= self.elapsed_time
-            if self.remaining_time <= 0:
-                self.motion = 'falling'
-                self.jump_active = False
+        self.acceleration = 1
 
     def start_jump(self):
+        self.jump_active = True
         if self.on_ground:
             self.sound['jumping'].play()
-            self.reset_jump()
+
             self.speed_y = -self.jump_speed
             self.motion = 'jumping'
-        elif self.speed_y < 0:
-            self.jump_active = self.remaining_time > 0
 
     def stop_jump(self):
         self.jump_active = False

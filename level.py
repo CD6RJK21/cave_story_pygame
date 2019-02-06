@@ -25,6 +25,12 @@ def create_test_map():
     tiles[4][3].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
     tiles[4][2] = Tile('wall', pygame.sprite.Sprite())
     tiles[4][2].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
+    tiles[4][5] = Tile('wall', pygame.sprite.Sprite())
+    tiles[4][5].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
+    tiles[3][5] = Tile('wall', pygame.sprite.Sprite())
+    tiles[3][5].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
+    tiles[3][9] = Tile('wall', pygame.sprite.Sprite())
+    tiles[3][9].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
     return tiles
 
 
@@ -64,9 +70,12 @@ class Map:
         first_col = rectangle.left / TILESIZE
         last_col = rectangle.right / TILESIZE
         collision_tiles = []
-        for row in range(int(first_row), int(last_row)+ 1):  # TODO: check if we need there +1
-            for col in range(int(first_col), int(last_col)+ 1):
-                collision_tiles.append(CollisionTile(self.tiles[row][col].type, row, col))
+        for row in range(int(first_row), int(last_row) + 1):  # TODO: check if we need there +1
+            for col in range(int(first_col), int(last_col) + 1):
+                try:  # all of maps need to be closed, character shouldn't fall outside of map
+                    collision_tiles.append(CollisionTile(self.tiles[row][col].type, row, col))
+                except IndexError as ie:
+                    print(ie)
         return collision_tiles
 
     def update(self):
