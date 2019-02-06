@@ -37,6 +37,7 @@ class Player(pygame.sprite.Sprite):
         self.motion = 'staying'
         self.direction = 'left'
         self.look = 'fwd'
+        self.interacting = False
         self.last_state = 'staying_left_fwd'
         self.set_sprite('staying_left_fwd')
         self.rect = self.image.get_rect()
@@ -222,25 +223,30 @@ class Player(pygame.sprite.Sprite):
 
     def set_current_sprite_state(self):
         self.motion = self.get_sprite_state()
-        if self.last_state == '_'.join([self.get_sprite_state(), self.direction, self.look]):
+        if self.last_state == '_'.join([self.motion, self.direction, self.look]):
             return
         self.motion = self.get_sprite_state()
-        if self.look == 'down' and self.on_ground:
+        if self.look == 'down' and self.motion == 'staying':
+            self.set_sprite('_'.join([self.motion, self.direction, self.look]))
+        elif self.look == 'down' and self.on_ground:
             self.set_sprite('_'.join([self.motion, self.direction, 'fwd']))
         else:
             self.set_sprite('_'.join([self.motion, self.direction, self.look]))
 
     def start_running_left(self):
+        self.interacting = False
         self.motion = 'running'
         self.direction = 'left'
         self.acceleration = -1
 
     def start_running_right(self):
+        self.interacting = False
         self.motion = 'running'
         self.direction = 'right'
         self.acceleration = 1
 
     def start_jump(self):
+        self.interacting = False
         self.jump_active = True
         if self.on_ground:
             self.sound['jumping'].play()
@@ -265,6 +271,8 @@ class Player(pygame.sprite.Sprite):
         self.set_current_sprite_state()
         self.updatex(maap)
         self.updatey(maap)
+
+        self.interacting = True if self.motion == 'staying' and self.look == 'down' else False  # TODO: test interacting
 
         if len(self.frames) > 1:
             self.time += 1

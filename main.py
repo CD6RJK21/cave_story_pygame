@@ -25,6 +25,7 @@ support_group.draw(screen)
 pygame.display.flip()
 
 maap = Map(create_test_map())
+maap.FixedBackdrop(load_image('bkBlue.png'))
 
 running = True
 pygame.mixer.music.load('data/music/gestation.mp3')  # TODO: enable music
@@ -49,6 +50,7 @@ while running:
                 player.look = 'up'
             elif pressed[pygame.K_DOWN]:
                 player.look = 'down'
+                player.interacting = True
             if event.key == pygame.K_LEFT:
                 player.start_running_left()
             elif event.key == pygame.K_RIGHT:
@@ -65,13 +67,15 @@ while running:
                 player.look = 'fwd'
             elif event.key == pygame.K_DOWN:
                 player.look = 'fwd'
+                player.interacting = False
             elif event.key == pygame.K_z:
                 player.stop_jump()
     all_sprites.update()
     all_sprites.draw(screen)
+    maap.draw(screen, True)
     player_group.update(maap)
     player_group.draw(screen)
     maap.update()
-    maap.draw(screen)
+    maap.draw(screen, False)
     clock.tick(FPS)
     pygame.display.flip()
