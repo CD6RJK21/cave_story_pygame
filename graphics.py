@@ -37,6 +37,23 @@ class AnimatedSprite(pygame.sprite.Sprite):
                 self.time = 0
 
 
+class ChosenAnimatedSprite(pygame.sprite.Sprite):
+    def __init__(self, sprite_group, frames, update_time):
+        super().__init__(sprite_group)
+        self.update_time = update_time
+        self.time = 0
+        self.frames = frames
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
+
+    def update(self):
+        self.time += 1
+        if self.time >= self.update_time:
+            self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+            self.image = self.frames[self.cur_frame]
+            self.time = 0
+
+
 # class ChosenAnimatedSprite(AnimatedSprite):
 #     def __init__(self, sprite_group, sheet, columns, rows, x, y, update_time, chosen_sprites):  # e.g. chosen_sprites:
 #         super().__init__(sprite_group, sheet, columns, rows, x, y, update_time)  # [(row, column), ...]

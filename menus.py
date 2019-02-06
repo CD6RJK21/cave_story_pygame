@@ -1,5 +1,5 @@
 import pygame
-from graphics import load_image, cut_image_one, AnimatedSprite
+from graphics import *
 
 
 def main_menu(screen):
@@ -66,6 +66,68 @@ def main_menu(screen):
         return 'new'
     elif active_button == 'load':
         return 'load'
+
+
+def quit_menu(screen, resolution):
+    clock = pygame.time.Clock()
+    move_sound = pygame.mixer.Sound('data/sound/menu_move.wav')
+    dialog_window_group = pygame.sprite.Group()
+    dialog_window = pygame.sprite.Sprite(dialog_window_group)
+    dialog_window.image = cut_image_one(load_image('TextBox.png'), (310, 102), (463, 153))
+    dialog_window.rect = dialog_window.image.get_rect()
+    dialog_window.rect.x = resolution[0]
+    dialog_window.rect.y = resolution[1] / 2
+    arrow_group = pygame.sprite.Group()
+    arrow = ChosenAnimatedSprite(arrow_group, [cut_image_one(load_image('TextBox.png'), (227, 180), (251, 199)),
+                                               cut_image_one(load_image('TextBox.png'), (258, 180), (283, 199))], 120)
+    arrow.rect = arrow.image.get_rect()
+    arrow.rect.x = dialog_window.rect.x + 80
+    arrow.rect.y = dialog_window.rect.y + 20
+    active_button = 'no'
+    slide = False
+    runn = True
+    while runn:
+        screen.fill((0, 0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_z:
+                    if active_button == 'yes':
+                        exit()
+                    else:
+                        runn = False
+                elif event.key == pygame.K_LEFT:
+                    if active_button == 'no':
+                        move_sound.play()
+                        active_button = 'yes'
+                        arrow.rect.x = dialog_window.rect.x + 2
+                    else:
+                        move_sound.play()
+                        active_button = 'no'
+                        arrow.rect.x = dialog_window.rect.x + 80
+                elif event.key == pygame.K_RIGHT:
+                    if active_button == 'yes':
+                        move_sound.play()
+                        active_button = 'no'
+                        arrow.rect.x = dialog_window.rect.x + 2
+                    else:
+                        move_sound.play()
+                        active_button = 'yes'
+                        arrow.rect.x = dialog_window.rect.x + 80
+        if not slide:
+            dialog_window.rect.x -= 5
+            arrow.rect.x = dialog_window.rect.x + 80
+            arrow.rect.y = dialog_window.rect.y + 20
+            if dialog_window.rect.x <= resolution[0] - dialog_window.rect.width:
+                slide = True
+        dialog_window_group.draw(screen)
+        arrow_group.update()
+        arrow_group.draw(screen)
+        clock.tick(120)
+        pygame.display.flip()
+
+
 
 
 

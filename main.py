@@ -15,10 +15,19 @@ player_group = pygame.sprite.Group()
 player = Player(player_group, (50, 50))
 main_menu_res = main_menu(screen)
 
+support_group = pygame.sprite.Group()
+screen.fill((0, 0, 0))
+loading = pygame.sprite.Sprite(support_group)
+loading.image = load_image('Loading.png')
+loading.rect = loading.image.get_rect()
+loading.rect.x, loading.rect.y = WIDTH / 2 - loading.rect.width / 2, HEIGHT / 2 - loading.rect.height / 2
+support_group.draw(screen)
+pygame.display.flip()
+
 maap = Map(create_test_map())
 
 running = True
-pygame.mixer.music.load('data/music/gestation.mp3')
+pygame.mixer.music.load('data/music/gestation.mp3')  # TODO: enable music
 pygame.mixer.music.play(-1)
 while running:
     screen.fill((0, 0, 0))
@@ -29,6 +38,9 @@ while running:
             pressed = pygame.key.get_pressed()
             if pressed[pygame.K_F4] and pressed[pygame.K_LALT]:
                 exit()  # TODO: make exit dialog window
+            if event.key == pygame.K_ESCAPE:
+                quit_menu(screen, resolution)
+                continue
             # if pressed[pygame.K_RIGHT] and pressed[pygame.K_LEFT]:
             #     player.stop_running()
             if pressed[pygame.K_UP] and pressed[pygame.K_DOWN]:
