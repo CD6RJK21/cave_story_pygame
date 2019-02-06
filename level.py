@@ -19,8 +19,12 @@ def create_test_map():
         tiles[row][col].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
     tiles[5][4] = Tile('wall', pygame.sprite.Sprite())
     tiles[5][4].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
+    tiles[5][3] = Tile('wall', pygame.sprite.Sprite())
+    tiles[5][3].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
     tiles[4][3] = Tile('wall', pygame.sprite.Sprite())
     tiles[4][3].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
+    tiles[4][2] = Tile('wall', pygame.sprite.Sprite())
+    tiles[4][2].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
     return tiles
 
 
@@ -54,15 +58,14 @@ class Map:
                     self.tiles[row][col].sprite.rect.y = row * TILESIZE
                     self.foreground_group.add(self.tiles[row][col].sprite)
 
-    def get_colliding_tiles(self, x, y, width, height):
-        rectangle = Rectangle(x, y, width, height)
+    def get_colliding_tiles(self, rectangle):
         first_row = rectangle.top / TILESIZE
         last_row = rectangle.bottom / TILESIZE
         first_col = rectangle.left / TILESIZE
         last_col = rectangle.right / TILESIZE
         collision_tiles = []
-        for row in range(first_row, last_row + 1):  # TODO: check if we need there +1
-            for col in range(first_col, last_col + 1):
+        for row in range(int(first_row), int(last_row)+ 1):  # TODO: check if we need there +1
+            for col in range(int(first_col), int(last_col)+ 1):
                 collision_tiles.append(CollisionTile(self.tiles[row][col].type, row, col))
         return collision_tiles
 

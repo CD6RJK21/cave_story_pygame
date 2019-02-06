@@ -57,7 +57,7 @@ while running:
                 player.stop_jump()
     all_sprites.update()
     all_sprites.draw(screen)
-    player_group.update()
+    player_group.update(maap)
     player_group.draw(screen)
     maap.update()
     maap.draw(screen)

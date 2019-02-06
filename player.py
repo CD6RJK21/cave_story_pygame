@@ -1,11 +1,14 @@
 import pygame
-from graphics import load_image, cut_image_one, AnimatedSprite
+from graphics import *
 from level import *
 
+TILESIZE = 32
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, player_group, pos):
         super().__init__(player_group)
+        self.rectangle_x = Rectangle(6, 10, 20, 12)
+        self.rectangle_y = Rectangle(10, 2, 12, 30)
 
         self.walking_acceleration = 0.3
         self.acceleration = 0
@@ -36,6 +39,122 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.move(pos[0], pos[1])
 
+    def collision_info(self, maap, rectangle):
+        tiles = maap.get_colliding_tiles(rectangle)
+        info = {'collided': False, 'row': 0, 'col': 0}
+        for i in range(len(tiles)):
+            if tiles[i].type == 'wall':
+                info['row'] = tiles[i].row
+                info['col'] = tiles[i].col
+                info['collided'] = True
+                break
+        return info
+
+    def bottom_collision(self, delta):
+        assert delta >= 0
+        return Rectangle(self.rect.x + self.rectangle_y.left,
+                         self.rect.y + self.rectangle_y.top + self.rectangle_y.width / 2,
+                         self.rectangle_y.width,  self.rectangle_y.height / 1.2 + delta)  # TODO: test bottom_collision
+
+    def top_collision(self, delta):
+        assert delta <= 0
+        return Rectangle(self.rect.x + self.rectangle_y.left, self.rect.y + self.rectangle_y.top + delta,
+                         self.rectangle_y.width, self.rectangle_y.height / 2 - delta)
+
+    def left_collision(self, delta):
+        assert delta <= 0
+        return Rectangle(self.rect.x + self.rectangle_x.left + delta, self.rect.y + self.rectangle_x.top,
+                         self.rectangle_x.width / 2 - delta, self.rectangle_x.height)
+
+    def right_collision(self, delta):
+        assert delta >= 0
+        return Rectangle(self.rect.x + self.rectangle_x.left + self.rectangle_x.width / 2,
+                         self.rect.y + self.rectangle_x.top, self.rectangle_x.width / 2 + delta,
+                         self.rectangle_x.height)
+
+    def updatex(self, maap):
+        # Speed update
+        self.speed_x += self.acceleration
+        if self.acceleration > 0:
+            self.speed_x = min(self.speed_x, self.max_speed_x)
+        elif self.acceleration < 0:
+            self.speed_x = max(self.speed_x, -self.max_speed_x)
+        else:
+            if self.speed_x < 0:
+                self.speed_x *= self.slowdown * 1
+                if self.speed_x > -0.4:
+                    self.speed_x = 0
+            # if self.speed_x < 0:
+            #     self.speed_x *= self.slowdown * 0.13
+            self.speed_x *= self.slowdown
+
+        delta = self.speed_x
+        # Running to right
+        if delta > 0:
+            info = self.collision_info(maap, self.right_collision(delta))
+            if info['collided']:
+                self.rect.x = info['col'] * TILESIZE - self.rectangle_x.right
+                self.speed_x = 0
+            else:
+                self.rect.x += delta
+
+            info = self.collision_info(maap, self.left_collision(0))
+            if info['collided']:
+                self.rect.x = info['col'] * TILESIZE + TILESIZE / 1.52 + self.rectangle_x.left
+        # Running to left
+        elif delta < 0:
+            info = self.collision_info(maap, self.left_collision(delta))
+            if info['collided']:  # TODO: fix a little space between player and tile
+                self.rect.x = info['col'] * TILESIZE + TILESIZE / 1.55 + self.rectangle_x.left
+                self.speed_x = 0
+            else:
+                self.rect.x += delta
+
+            info = self.collision_info(maap, self.right_collision(0))
+            if info['collided']:
+                self.rect.x = info['col'] * TILESIZE - self.rectangle_x.right
+
+    def updatey(self, maap):
+        # Speed update
+        self.update_jump()
+        self.elapsed_time += 1
+
+        if not self.jump_active:
+            self.speed_y = min(self.speed_y + self.gravity, self.max_speed_y)
+
+        delta = self.speed_y
+        if delta > 0:
+            info = self.collision_info(maap, self.bottom_collision(delta))
+            if info['collided']:
+                self.rect.y = info['row'] * TILESIZE - self.rectangle_y.bottom
+                self.speed_y = 0
+                self.on_ground = True
+            else:
+                self.on_ground = False
+                self.rect.y += delta
+
+            info = self.collision_info(maap, self.top_collision(0))
+            if info['collided']:
+                self.rect.y = info['row'] * TILESIZE + self.rectangle_y.height
+        elif delta < 0:
+            info = self.collision_info(maap, self.top_collision(delta))
+            if info['collided']:
+                self.rect.y = info['row'] * TILESIZE + TILESIZE + self.rectangle_y.top
+                self.speed_y = 0
+            else:
+                self.on_ground = False
+                self.rect.y += delta
+
+            info = self.collision_info(maap, self.bottom_collision(0))
+            if info['collided']:
+                self.on_ground = True
+                self.rect.y = info['row'] * TILESIZE - self.rectangle_y.bottom
+
+        # if self.rect.y >= 192 - self.rect.height:  # TODO: remove this temporary solution
+        #     self.rect.y = 192 - self.rect.height
+        #     self.speed_y = 0
+        # self.on_ground = self.rect.y == 192 - self.rect.height
+
     def cut_sheet(self, sheet, columns, rows, chosen_sprites=list()):
         frames = []
         rect = pygame.Rect(0, 0, sheet.get_width() // columns,
@@ -54,7 +173,7 @@ class Player(pygame.sprite.Sprite):
 
     def set_sprite(self, state):
         self.last_state = '_'.join([self.get_sprite_state(), self.direction, self.look])
-        sprites = {'staying_left_back': self.cut_sheet(self.player_image, 11, 4, [[0, 7]]),
+        sprites = {'staying_left_down': self.cut_sheet(self.player_image, 11, 4, [[0, 7]]),
                    'staying_left_fwd': self.cut_sheet(self.player_image, 11, 4, [[0, 0]]),
                    'staying_left_up': self.cut_sheet(self.player_image, 11, 4, [[0, 3]]),
                    'running_left_fwd': self.cut_sheet(self.player_image, 11, 4, [[0, 2], [0, 0], [0, 1], [0, 0]]),
@@ -65,7 +184,7 @@ class Player(pygame.sprite.Sprite):
                    'falling_left_fwd': self.cut_sheet(self.player_image, 11, 4, [[0, 1]]),
                    'falling_left_up': self.cut_sheet(self.player_image, 11, 4, [[0, 4]]),
                    'falling_left_down': self.cut_sheet(self.player_image, 11, 4, [[0, 6]]),
-                   'staying_right_back': self.cut_sheet(self.player_image, 11, 4, [[1, 7]]),
+                   'staying_right_down': self.cut_sheet(self.player_image, 11, 4, [[1, 7]]),
                    'staying_right_fwd': self.cut_sheet(self.player_image, 11, 4, [[1, 0]]),
                    'staying_right_up': self.cut_sheet(self.player_image, 11, 4, [[1, 3]]),
                    'running_right_fwd': self.cut_sheet(self.player_image, 11, 4, [[1, 2], [1, 0], [1, 1], [1, 0]]),
@@ -96,9 +215,8 @@ class Player(pygame.sprite.Sprite):
         self.motion = self.get_sprite_state()
         if self.last_state == '_'.join([self.get_sprite_state(), self.direction, self.look]):
             return
-        if self.look == 'down' and (self.motion == 'staying'):
-            self.set_sprite('_'.join([self.motion, self.direction, 'back']))
-        elif self.look == 'down' and self.on_ground:
+        self.motion = self.get_sprite_state()
+        if self.look == 'down' and self.on_ground:
             self.set_sprite('_'.join([self.motion, self.direction, 'fwd']))
         else:
             self.set_sprite('_'.join([self.motion, self.direction, self.look]))
@@ -146,35 +264,10 @@ class Player(pygame.sprite.Sprite):
         # elif self.direction == 'right':
         #     self.set_sprite('staying_right')
 
-    def update(self):
+    def update(self, maap):
         self.set_current_sprite_state()
-        self.rect.x += self.speed_x
-        self.speed_x += self.acceleration  # TODO: fix player walking stops when both arrows are pressed
-        # if (self.speed_x < self.max_speed_x and (self.speed_x > 0)) or\
-        #         (self.speed_x > -self.max_speed_x and (self.speed_x < 0)) or self.speed_x * self.acceleration <= 0:
-        #     self.speed_x += self.acceleration
-        if self.acceleration > 0:
-            self.speed_x = min(self.speed_x, self.max_speed_x)
-        elif self.acceleration < 0:
-            self.speed_x = max(self.speed_x, -self.max_speed_x)
-        else:
-            if self.speed_x < 0:
-                self.speed_x *= self.slowdown * 1
-                if self.speed_x > -0.4:
-                    self.speed_x = 0
-            # if self.speed_x < 0:
-            #     self.speed_x *= self.slowdown * 0.13
-            self.speed_x *= self.slowdown
-
-        self.update_jump()
-        self.elapsed_time += 1
-        self.rect.y += self.speed_y
-        if not self.jump_active:
-            self.speed_y = min(self.speed_y + self.gravity, self.max_speed_y)
-        if self.rect.y >= 192 - self.rect.height:  # TODO: remove this temporary solution
-            self.rect.y = 192 - self.rect.height
-            self.speed_y = 0
-        self.on_ground = self.rect.y == 192 - self.rect.height
+        self.updatex(maap)
+        self.updatey(maap)
 
         if len(self.frames) > 1:
             self.time += 1
