@@ -82,7 +82,7 @@ while running:
     player.update(maap)
     player.draw(screen)
     if player.damage_rectangle().collide_width(bat.damage_rectangle()):
-        player.take_damage()
+        player.take_damage(1)
     maap.update()
     maap.draw(screen)
     player.drawHUD(screen)

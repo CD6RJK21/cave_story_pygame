@@ -51,6 +51,10 @@ class Player(pygame.sprite.Sprite):
 
         self.health_max = 3
         self.health_current = 3
+        self.dead = False
+        self.damage_time = 0
+        self.damage = 0
+        self.damage_delay = 90
 
         self.health_background_group = pygame.sprite.Group()
         self.health_background_sprite = pygame.sprite.Sprite(self.health_background_group)
@@ -64,7 +68,6 @@ class Player(pygame.sprite.Sprite):
         self.health_fill_sprite.rect.x, self.health_fill_sprite.rect.y = 2.5 * TILESIZE, 2 * TILESIZE + 3
         self.health_number_group = pygame.sprite.Group()
         self.health_number = NumberSprite(self.health_number_group, self.health_current, (2 * TILESIZE, 2 * TILESIZE))
-        self.health_number.update_num(56)
 
     def collision_info(self, maap, rectangle):
         tiles = maap.get_colliding_tiles(rectangle)
@@ -284,11 +287,14 @@ class Player(pygame.sprite.Sprite):
     def stop_jump(self):
         self.jump_active = False
 
-    def take_damage(self):
+    def take_damage(self, damage):
         if self.invincible:
             return
+        # self.dead = self.health_current > 0
         self.speed_y = min(-self.shortjump_speed, self.speed_y)
-        print('I need healing!!')
+        self.damage = damage
+        self.damage_time = 0
+        # self.health_current -= damage
         self.invincible = True
         self.invincible_time = 0
 
@@ -325,6 +331,12 @@ class Player(pygame.sprite.Sprite):
         if self.invincible:
             self.invincible_time += 1
             self.invincible = self.invincible_time < self.invincible_time_max
+        if self.damage > 0:
+            self.damage_time += 1
+            if self.damage_time > self.damage_delay:
+                self.health_current -= self.damage
+                self.damage = 0
+                self.health_number.update_num(self.health_current)
 
         if len(self.frames) > 1:
             self.time += 1
