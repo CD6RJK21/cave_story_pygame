@@ -99,15 +99,6 @@ def cut_sheet(sheet, columns, rows, chosen_sprites=list()):
     return frames
 
 
-def get_number_image(num, colour='w'):
-    numbers = cut_sheet(load_image('numbers.png'), 10, 2)
-    numbers_red = numbers[10:]
-    if colour == 'w':
-        return numbers[num]
-    else:
-        return numbers_red[num]
-
-
 def cut_image_one(image, pos1, pos2):
     image = image.subsurface(pygame.Rect(pos1, (pos2[0] - pos1[0], pos2[1] - pos1[1])))
     return image
@@ -144,3 +135,52 @@ class Rectangle:
     def collide_width(self, rect):
         return self.right >= rect.left and self.left <= rect.right and\
                self.top <= rect.bottom and self.bottom >= rect.top
+
+
+class NumberSprite:
+    def __init__(self, group, num, pos, colour='w'):
+        self.group = group
+        self.pos = pos
+        self.colour = colour
+        if num < 10 and (num > -1):
+            self.sprite = pygame.sprite.Sprite(self.group)
+            self.one_digit(num)
+            self.sprite.rect.x, self.sprite.rect.y = pos
+        elif num > -1:
+            self.num = num
+            self.multiple_number_sprites()
+
+    def multiple_number_sprites(self):
+        if self.colour == 'w':
+            numbers = cut_sheet(load_image('numbers.png'), 10, 2)
+        else:
+            numbers = cut_sheet(load_image('numbers.png'), 10, 2)[10:]
+        self.num = str(self.num)
+        i = len(self.num)
+        self.number_sprites = []
+        for num in self.num:
+            i -= 1
+            number = pygame.sprite.Sprite(self.group)
+            number.image = numbers[int(num)]
+            number.rect = number.image.get_rect()
+            number.rect.x, number.rect.y = self.pos[0] - 16 * i, self.pos[1]
+
+    def update_num(self, num):
+        self.group.empty()
+        if num < 10 and (num > -1):
+            self.sprite = pygame.sprite.Sprite(self.group)
+            self.one_digit(num)
+            self.sprite.rect.x, self.sprite.rect.y = self.pos
+        elif num > -1:
+            self.num = num
+            self.multiple_number_sprites()
+
+    def one_digit(self, num, colour='w'):
+        numbers = cut_sheet(load_image('numbers.png'), 10, 2)
+        numbers_red = numbers[10:]
+        if colour == 'w':
+            self.sprite.image =  numbers[num]
+        else:
+            self.sprite.image = numbers_red[num]
+        self.sprite.rect = self.sprite.image.get_rect()
+

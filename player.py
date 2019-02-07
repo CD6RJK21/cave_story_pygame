@@ -49,6 +49,9 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.move(pos[0], pos[1])
 
+        self.health_max = 3
+        self.health_current = 3
+
         self.health_background_group = pygame.sprite.Group()
         self.health_background_sprite = pygame.sprite.Sprite(self.health_background_group)
         self.health_background_sprite.image = cut_image_one(load_image('TextBox.png'), (0, 80), (125, 94))
@@ -59,10 +62,9 @@ class Player(pygame.sprite.Sprite):
         self.health_fill_sprite.image = cut_image_one(load_image('TextBox.png'), (48, 50), (125, 59))
         self.health_fill_sprite.rect = self.health_fill_sprite.image.get_rect()
         self.health_fill_sprite.rect.x, self.health_fill_sprite.rect.y = 2.5 * TILESIZE, 2 * TILESIZE + 3
-        self.three = pygame.sprite.Sprite(self.health_foreground)
-        self.three.image = get_number_image(3)
-        self.three.rect = self.three.image.get_rect()
-        self.three.rect.x, self.three.rect.y = 2 * TILESIZE, 2 * TILESIZE
+        self.health_number_group = pygame.sprite.Group()
+        self.health_number = NumberSprite(self.health_number_group, self.health_current, (2 * TILESIZE, 2 * TILESIZE))
+        self.health_number.update_num(56)
 
     def collision_info(self, maap, rectangle):
         tiles = maap.get_colliding_tiles(rectangle)
@@ -311,6 +313,7 @@ class Player(pygame.sprite.Sprite):
         if self.sprite_is_visible():
             self.health_background_group.draw(screen)
             self.health_foreground.draw(screen)
+            self.health_number_group.draw(screen)
 
     def update(self, maap):
         self.set_current_sprite_state()
