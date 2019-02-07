@@ -78,10 +78,12 @@ while running:
     all_sprites.update()
     all_sprites.draw(screen)
     maap.draw_background(screen)
-    bat.update()
+    bat.update(player)
     bat.draw(screen)
     player_group.update(maap)
     player_group.draw(screen)
+    if player.damage_rectangle().collide_width(bat.damage_rectangle()):
+        player.take_damage()
     maap.update()
     maap.draw(screen)
     clock.tick(FPS)

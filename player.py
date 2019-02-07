@@ -214,6 +214,10 @@ class Player(pygame.sprite.Sprite):
         self.state = state
         self.image = self.frames[0]
 
+    def damage_rectangle(self):
+        return Rectangle(self.rect.x + self.rectangle_x.left, self.rect.y + self.rectangle_y.top,
+                                          self.rectangle_x.width, self.rectangle_y.height)
+
     def get_sprite_state(self):
         if self.on_ground:
             motion = 'staying' if self.acceleration == 0 else 'running'
@@ -256,6 +260,9 @@ class Player(pygame.sprite.Sprite):
 
     def stop_jump(self):
         self.jump_active = False
+
+    def take_damage(self):
+        print('I need healing!!')
 
     def stop_running(self):
         # while self.speed_x > 0:

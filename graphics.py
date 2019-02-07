@@ -132,3 +132,6 @@ class Rectangle:
         self.top = y
         self.bottom = y + height
 
+    def collide_width(self, rect):
+        return self.right >= rect.left and self.left <= rect.right and\
+               self.top <= rect.bottom and self.bottom >= rect.top
