@@ -30,7 +30,7 @@ maap = Map(test_map[0])
 maap.FixedBackdrop(load_image('bkBlue.png'))
 maap.background(test_map[1])
 
-bat = FirstCaveBat(50, 150)
+bat = FirstCaveBat(6*32, 3*32)
 
 running = True
 pygame.mixer.music.load('data/music/gestation.mp3')
@@ -78,10 +78,10 @@ while running:
     all_sprites.update()
     all_sprites.draw(screen)
     maap.draw_background(screen)
+    bat.update()
+    bat.draw(screen)
     player_group.update(maap)
     player_group.draw(screen)
-    bat.update()
-    bat.sprite_group.draw(screen)
     maap.update()
     maap.draw(screen)
     clock.tick(FPS)
