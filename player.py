@@ -5,8 +5,9 @@ from level import *
 TILESIZE = 32
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, player_group, pos):
-        super().__init__(player_group)
+    def __init__(self, pos):
+        self.group = pygame.sprite.Group()
+        super().__init__(self.group)
         self.sound = {'running': pygame.mixer.Sound('data/sound/quote_walk.wav'),
                       'head_bump': pygame.mixer.Sound('data/sound/quote_bonkhead.wav'),
                       'jumping': pygame.mixer.Sound('data/sound/quote_jump.wav')
@@ -26,14 +27,19 @@ class Player(pygame.sprite.Sprite):
         self.gravity = 0.23
         self.speed_y = 0
         self.jump_speed = 4
+        self.shortjump_speed = self.jump_speed / 1.5
         self.on_ground = False
         self.jump_active = False
+
+        self.invincible = False
+        self.invincible_time = 0
+        self.invincible_time_max = 180
+        self.invincible_flash_time = 4
 
         self.update_time = 8
         self.time = 0
         self.cur_frame = 0
         self.player_image = load_image('MyChar.png')
-        self.player_group = player_group
         self.motion = 'staying'
         self.direction = 'left'
         self.look = 'fwd'
@@ -262,7 +268,12 @@ class Player(pygame.sprite.Sprite):
         self.jump_active = False
 
     def take_damage(self):
+        if self.invincible:
+            return
+        self.speed_y = min(-self.shortjump_speed, self.speed_y)
         print('I need healing!!')
+        self.invincible = True
+        self.invincible_time = 0
 
     def stop_running(self):
         # while self.speed_x > 0:
@@ -274,12 +285,21 @@ class Player(pygame.sprite.Sprite):
         # elif self.direction == 'right':
         #     self.set_sprite('staying_right')
 
+    def draw(self, screen):
+        if self.invincible and self.invincible_time % self.invincible_flash_time == 0:
+            return
+        self.group.draw(screen)
+
     def update(self, maap):
         self.set_current_sprite_state()
         self.updatex(maap)
         self.updatey(maap)
 
         self.interacting = True if self.motion == 'staying' and self.look == 'down' else False  # TODO: test interacting
+
+        if self.invincible:
+            self.invincible_time += 1
+            self.invincible = self.invincible_time < self.invincible_time_max
 
         if len(self.frames) > 1:
             self.time += 1

@@ -12,8 +12,7 @@ pygame.init()
 screen = pygame.display.set_mode(resolution)  # , pygame.FULLSCREEN
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
-player_group = pygame.sprite.Group()
-player = Player(player_group, (50, 50))
+player = Player((50, 50))
 main_menu_res = main_menu(screen)
 
 support_group = pygame.sprite.Group()
@@ -80,8 +79,8 @@ while running:
     maap.draw_background(screen)
     bat.update(player)
     bat.draw(screen)
-    player_group.update(maap)
-    player_group.draw(screen)
+    player.update(maap)
+    player.draw(screen)
     if player.damage_rectangle().collide_width(bat.damage_rectangle()):
         player.take_damage()
     maap.update()
