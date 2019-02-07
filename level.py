@@ -16,24 +16,35 @@ def create_test_map():
     # empty_sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
     # empty_sprite.rect = empty_sprite.image.get_rect()
     tiles = [[Tile() for _ in range(cols)] for k in range(rows)]
+    background_tiles = [[0 for _ in range(cols)] for k in range(rows)]
     for col in range(cols):
         tiles[row][col] = Tile('wall', pygame.sprite.Sprite())
         tiles[row][col].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
+    wall_image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
+    chain_tiles = cut_level(load_image('PrtCave.png'), 5, 16, [[2, 11], [2, 12], [2, 13]])
     tiles[5][4] = Tile('wall', pygame.sprite.Sprite())
-    tiles[5][4].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
+    tiles[5][4].sprite.image = wall_image
     tiles[5][3] = Tile('wall', pygame.sprite.Sprite())
-    tiles[5][3].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
+    tiles[5][3].sprite.image = wall_image
     tiles[4][3] = Tile('wall', pygame.sprite.Sprite())
-    tiles[4][3].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
+    tiles[4][3].sprite.image = wall_image
     tiles[4][2] = Tile('wall', pygame.sprite.Sprite())
-    tiles[4][2].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
+    tiles[4][2].sprite.image = wall_image
     tiles[4][5] = Tile('wall', pygame.sprite.Sprite())
-    tiles[4][5].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
+    tiles[4][5].sprite.image = wall_image
     tiles[3][5] = Tile('wall', pygame.sprite.Sprite())
-    tiles[3][5].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
+    tiles[3][5].sprite.image = wall_image
     tiles[3][9] = Tile('wall', pygame.sprite.Sprite())
-    tiles[3][9].sprite.image = cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0]
-    return tiles
+    tiles[3][9].sprite.image = wall_image
+    background_tiles[2][10] = pygame.sprite.Sprite()
+    background_tiles[2][10].image = chain_tiles[0]
+    for i in range(3, 5):
+        background_tiles[i][10] = pygame.sprite.Sprite()
+        background_tiles[i][10].image = chain_tiles[1]
+    background_tiles[5][10] = pygame.sprite.Sprite()
+    background_tiles[5][10].image = chain_tiles[2]
+
+    return tiles, background_tiles
 
 
 class Tile:
@@ -53,7 +64,8 @@ class CollisionTile:
 
 class Map:
     def __init__(self, tiles):
-        self.backdrop_exists = False
+        self.backdrop_group = pygame.sprite.Group()
+        self.background_group = pygame.sprite.Group()
         self.foreground_group = pygame.sprite.Group()
         self.tiles = tiles
         self.rows = len(self.tiles)  # height / TILESIZE
@@ -67,12 +79,24 @@ class Map:
                     self.tiles[row][col].sprite.rect.y = row * TILESIZE
                     self.foreground_group.add(self.tiles[row][col].sprite)
 
+    def background(self, tiles):
+        self.background_tiles = tiles
+        self.background_exists = True
+        for row in range(self.rows):
+            for col in range(self.cols):
+                if self.background_tiles[row][col] != 0:
+                    self.background_tiles[row][col].rect = \
+                        self.background_tiles[row][col].image.get_rect()
+                    self.background_tiles[row][col].rect.x = col * TILESIZE
+                    self.background_tiles[row][col].rect.y = row * TILESIZE
+                    self.backdrop_group.add(self.background_tiles[row][col])
+
+
     def FixedBackdrop(self, image):
         self.backdrop_exists = True
         self.backdrop_image = image
         backdrop_rows = self.rows // 4 + 1
         backdrop_cold = self.cols // 4 + 1
-        self.backdrop_group = pygame.sprite.Group()
         for row in range(backdrop_rows):
             for col in range(backdrop_cold):
                 backdrop_tile = pygame.sprite.Sprite()
@@ -99,13 +123,16 @@ class Map:
     def update(self):
         if self.backdrop_exists:
             self.foreground_group.update()
+        if self.background_exists:
+            self.backdrop_group.update()
         self.foreground_group.update()
 
-    def draw(self, screen, drawbackground=False):
-        if drawbackground:
-            self.backdrop_group.draw(screen)
-        else:
-            self.foreground_group.draw(screen)
+    def draw_background(self, screen):
+        self.backdrop_group.draw(screen)
+        self.background_group.draw(screen)
+
+    def draw(self, screen):
+        self.foreground_group.draw(screen)
 
 # class FixedBackdrop:
 #     def __init__(self, image):

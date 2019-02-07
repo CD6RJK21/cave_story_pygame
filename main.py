@@ -2,6 +2,7 @@ import pygame
 from menus import *
 from player import *
 from level import *
+from enemy import *
 
 TILESIZE = 32
 FPS = 60
@@ -24,11 +25,15 @@ loading.rect.x, loading.rect.y = WIDTH / 2 - loading.rect.width / 2, HEIGHT / 2 
 support_group.draw(screen)
 pygame.display.flip()
 
-maap = Map(create_test_map())
+test_map = create_test_map()
+maap = Map(test_map[0])
 maap.FixedBackdrop(load_image('bkBlue.png'))
+maap.background(test_map[1])
+
+bat = FirstCaveBat(50, 150)
 
 running = True
-pygame.mixer.music.load('data/music/gestation.mp3')  # TODO: enable music
+pygame.mixer.music.load('data/music/gestation.mp3')
 pygame.mixer.music.play(-1)
 while running:
     screen.fill((0, 0, 0))
@@ -72,10 +77,12 @@ while running:
                 player.stop_jump()
     all_sprites.update()
     all_sprites.draw(screen)
-    maap.draw(screen, True)
+    maap.draw_background(screen)
     player_group.update(maap)
     player_group.draw(screen)
+    bat.update()
+    bat.sprite_group.draw(screen)
     maap.update()
-    maap.draw(screen, False)
+    maap.draw(screen)
     clock.tick(FPS)
     pygame.display.flip()
