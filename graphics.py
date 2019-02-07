@@ -99,6 +99,15 @@ def cut_sheet(sheet, columns, rows, chosen_sprites=list()):
     return frames
 
 
+def get_number_image(num, colour='w'):
+    numbers = cut_sheet(load_image('numbers.png'), 10, 2)
+    numbers_red = numbers[10:]
+    if colour == 'w':
+        return numbers[num]
+    else:
+        return numbers_red[num]
+
+
 def cut_image_one(image, pos1, pos2):
     image = image.subsurface(pygame.Rect(pos1, (pos2[0] - pos1[0], pos2[1] - pos1[1])))
     return image

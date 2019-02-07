@@ -6,8 +6,8 @@ TILESIZE = 32
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos):
-        self.group = pygame.sprite.Group()
-        super().__init__(self.group)
+        self.player_group = pygame.sprite.Group()
+        super().__init__(self.player_group)
         self.sound = {'running': pygame.mixer.Sound('data/sound/quote_walk.wav'),
                       'head_bump': pygame.mixer.Sound('data/sound/quote_bonkhead.wav'),
                       'jumping': pygame.mixer.Sound('data/sound/quote_jump.wav')
@@ -33,7 +33,7 @@ class Player(pygame.sprite.Sprite):
 
         self.invincible = False
         self.invincible_time = 0
-        self.invincible_time_max = 180
+        self.invincible_time_max = 160
         self.invincible_flash_time = 4
 
         self.update_time = 8
@@ -48,6 +48,21 @@ class Player(pygame.sprite.Sprite):
         self.set_sprite('staying_left_fwd')
         self.rect = self.image.get_rect()
         self.rect.move(pos[0], pos[1])
+
+        self.health_background_group = pygame.sprite.Group()
+        self.health_background_sprite = pygame.sprite.Sprite(self.health_background_group)
+        self.health_background_sprite.image = cut_image_one(load_image('TextBox.png'), (0, 80), (125, 94))
+        self.health_background_sprite.rect = self.health_background_sprite.image.get_rect()
+        self.health_background_sprite.rect.x, self.health_background_sprite.rect.y = TILESIZE, 2 * TILESIZE
+        self.health_foreground = pygame.sprite.Group()
+        self.health_fill_sprite = pygame.sprite.Sprite(self.health_foreground)  # add group
+        self.health_fill_sprite.image = cut_image_one(load_image('TextBox.png'), (48, 50), (125, 59))
+        self.health_fill_sprite.rect = self.health_fill_sprite.image.get_rect()
+        self.health_fill_sprite.rect.x, self.health_fill_sprite.rect.y = 2.5 * TILESIZE, 2 * TILESIZE + 3
+        self.three = pygame.sprite.Sprite(self.health_foreground)
+        self.three.image = get_number_image(3)
+        self.three.rect = self.three.image.get_rect()
+        self.three.rect.x, self.three.rect.y = 2 * TILESIZE, 2 * TILESIZE
 
     def collision_info(self, maap, rectangle):
         tiles = maap.get_colliding_tiles(rectangle)
@@ -275,6 +290,9 @@ class Player(pygame.sprite.Sprite):
         self.invincible = True
         self.invincible_time = 0
 
+    def sprite_is_visible(self):
+        return not (self.invincible and self.invincible_time // self.invincible_flash_time % 2== 0)
+
     def stop_running(self):
         # while self.speed_x > 0:
         #     self.speed_x -= self.slowdown
@@ -286,9 +304,13 @@ class Player(pygame.sprite.Sprite):
         #     self.set_sprite('staying_right')
 
     def draw(self, screen):
-        if self.invincible and self.invincible_time % self.invincible_flash_time == 0:
-            return
-        self.group.draw(screen)
+        if self.sprite_is_visible():
+            self.player_group.draw(screen)
+
+    def drawHUD(self, screen):
+        if self.sprite_is_visible():
+            self.health_background_group.draw(screen)
+            self.health_foreground.draw(screen)
 
     def update(self, maap):
         self.set_current_sprite_state()

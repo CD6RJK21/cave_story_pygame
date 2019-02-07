@@ -85,5 +85,6 @@ while running:
         player.take_damage()
     maap.update()
     maap.draw(screen)
+    player.drawHUD(screen)
     clock.tick(FPS)
     pygame.display.flip()
