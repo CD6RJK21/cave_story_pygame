@@ -179,8 +179,26 @@ class NumberSprite:
         numbers = cut_sheet(load_image('numbers.png'), 10, 2)
         numbers_red = numbers[10:]
         if colour == 'w':
-            self.sprite.image =  numbers[num]
+            self.sprite.image = numbers[num]
         else:
             self.sprite.image = numbers_red[num]
         self.sprite.rect = self.sprite.image.get_rect()
 
+
+class VaryingWidthSprite(pygame.sprite.Sprite):
+    def __init__(self, sprite_group, image, pos1, pos, width, height):  # pos1 - this is the place where
+        super().__init__(sprite_group)                                  # you are going to place the sprite
+        self.image1 = image
+        self.pos = pos
+        self.pos1 = pos1
+        self.height = height
+        self.image = cut_image_one(load_image(self.image1), pos, (pos[0] + width, pos[1] + height))
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = pos1
+        self.width = width
+
+    def set_width(self, width):
+        self.image = cut_image_one(load_image(self.image1), self.pos, (self.pos[0] + width, self.pos[1] + self.height))
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = self.pos1
+        self.width = width

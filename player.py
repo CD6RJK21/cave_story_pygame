@@ -55,6 +55,7 @@ class Player(pygame.sprite.Sprite):
         self.damage_time = 0
         self.damage = 0
         self.damage_delay = 90
+        self.max_hp_fill_width = 2 * TILESIZE + 13
 
         self.health_background_group = pygame.sprite.Group()
         self.health_background_sprite = pygame.sprite.Sprite(self.health_background_group)
@@ -62,10 +63,13 @@ class Player(pygame.sprite.Sprite):
         self.health_background_sprite.rect = self.health_background_sprite.image.get_rect()
         self.health_background_sprite.rect.x, self.health_background_sprite.rect.y = TILESIZE, 2 * TILESIZE
         self.health_foreground = pygame.sprite.Group()
-        self.health_fill_sprite = pygame.sprite.Sprite(self.health_foreground)  # add group
-        self.health_fill_sprite.image = cut_image_one(load_image('TextBox.png'), (48, 50), (125, 59))
-        self.health_fill_sprite.rect = self.health_fill_sprite.image.get_rect()
-        self.health_fill_sprite.rect.x, self.health_fill_sprite.rect.y = 2.5 * TILESIZE, 2 * TILESIZE + 3
+        self.health_fill_sprite = VaryingWidthSprite(self.health_foreground,
+                                                     'TextBox.png', (2.5 * TILESIZE, 2 * TILESIZE + 3),
+                                                     (48, 50), self.fill_health_bar(self.health_current), 9)
+        self.damage_group = pygame.sprite.Group()
+        self.damage_fill_sprite = VaryingWidthSprite(self.damage_group,
+                                                     'TextBox.png', (2.5 * TILESIZE, 2 * TILESIZE + 3),
+                                                     (48, 66), self.fill_health_bar(self.health_current), 9)
         self.health_number_group = pygame.sprite.Group()
         self.health_number = NumberSprite(self.health_number_group, self.health_current, (2 * TILESIZE, 2 * TILESIZE))
 
@@ -297,9 +301,16 @@ class Player(pygame.sprite.Sprite):
         # self.health_current -= damage
         self.invincible = True
         self.invincible_time = 0
+        self.health_current -= self.damage
+        self.health_fill_sprite.set_width(self.fill_health_bar(self.health_current))
+        self.damage_fill_sprite.set_width(self.fill_health_bar(damage))
+        self.damage_fill_sprite.rect.x = 2.5 * TILESIZE + self.fill_health_bar(self.health_current)
+
+    def fill_health_bar(self, health):
+        return self.max_hp_fill_width * health // self.health_max
 
     def sprite_is_visible(self):
-        return not (self.invincible and self.invincible_time // self.invincible_flash_time % 2== 0)
+        return not (self.invincible and self.invincible_time // self.invincible_flash_time % 2 == 0)
 
     def stop_running(self):
         # while self.speed_x > 0:
@@ -320,6 +331,8 @@ class Player(pygame.sprite.Sprite):
             self.health_background_group.draw(screen)
             self.health_foreground.draw(screen)
             self.health_number_group.draw(screen)
+            if self.damage > 0:
+                self.damage_group.draw(screen)
 
     def update(self, maap):
         self.set_current_sprite_state()
@@ -334,7 +347,6 @@ class Player(pygame.sprite.Sprite):
         if self.damage > 0:
             self.damage_time += 1
             if self.damage_time > self.damage_delay:
-                self.health_current -= self.damage
                 self.damage = 0
                 self.health_number.update_num(self.health_current)
 
