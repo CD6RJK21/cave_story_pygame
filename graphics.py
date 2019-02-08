@@ -2,6 +2,11 @@ import pygame
 import os
 
 
+TILESIZE = 32
+FPS = 60
+resolution = WIDTH, HEIGHT = 640, 480
+
+
 class AnimatedSprite(pygame.sprite.Sprite):
     def __init__(self, sprite_group, sheet, columns, rows, x, y, update_time, chosen_sprites=False):
         super().__init__(sprite_group)

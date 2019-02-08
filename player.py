@@ -1,8 +1,6 @@
-import pygame
-from graphics import *
 from level import *
+from weapons import *
 
-TILESIZE = 32
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos):
@@ -72,6 +70,8 @@ class Player(pygame.sprite.Sprite):
                                                      (48, 66), self.fill_health_bar(self.health_current), 9)
         self.health_number_group = pygame.sprite.Group()
         self.health_number = NumberSprite(self.health_number_group, self.health_current, (2 * TILESIZE, 2 * TILESIZE))
+
+        self.polar_star = PolarStar()
 
     def collision_info(self, maap, rectangle):
         tiles = maap.get_colliding_tiles(rectangle)
@@ -261,10 +261,13 @@ class Player(pygame.sprite.Sprite):
             return
         self.motion = self.get_sprite_state()
         if self.look == 'down' and self.motion == 'staying':
+            self.polar_star.update(self.direction + '_' + 'fwd')
             self.set_sprite('_'.join([self.motion, self.direction, self.look]))
         elif self.look == 'down' and self.on_ground:
+            self.polar_star.update(self.direction + '_' + 'fwd')
             self.set_sprite('_'.join([self.motion, self.direction, 'fwd']))
         else:
+            self.polar_star.update(self.direction + '_' + self.look)
             self.set_sprite('_'.join([self.motion, self.direction, self.look]))
 
     def start_running_left(self):
@@ -324,6 +327,7 @@ class Player(pygame.sprite.Sprite):
 
     def draw(self, screen):
         if self.sprite_is_visible():
+            self.polar_star.draw(screen, self.rect.x, self.rect.y, self.motion, self.time, self.update_time)
             self.player_group.draw(screen)
 
     def drawHUD(self, screen):
@@ -349,6 +353,7 @@ class Player(pygame.sprite.Sprite):
             if self.damage_time > self.damage_delay:
                 self.damage = 0
                 self.health_number.update_num(self.health_current)
+
 
         if len(self.frames) > 1:
             self.time += 1

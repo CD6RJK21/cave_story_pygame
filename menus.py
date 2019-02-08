@@ -101,26 +101,26 @@ def quit_menu(screen, resolution, groups):
                     if active_button == 'no':
                         move_sound.play()
                         active_button = 'yes'
-                        arrow.rect.x = dialog_window.rect.x + 2
                     else:
                         move_sound.play()
                         active_button = 'no'
-                        arrow.rect.x = dialog_window.rect.x + 80
                 elif event.key == pygame.K_RIGHT:
                     if active_button == 'yes':
                         move_sound.play()
                         active_button = 'no'
-                        arrow.rect.x = dialog_window.rect.x + 2
                     else:
                         move_sound.play()
                         active_button = 'yes'
-                        arrow.rect.x = dialog_window.rect.x + 80
         if not slide:
             dialog_window.rect.x -= 5
             arrow.rect.x = dialog_window.rect.x + 80
             arrow.rect.y = dialog_window.rect.y + 20
             if dialog_window.rect.x <= resolution[0] - dialog_window.rect.width:
                 slide = True
+        if active_button == 'yes':
+            arrow.rect.x = dialog_window.rect.x + 2
+        else:
+            arrow.rect.x = dialog_window.rect.x + 80
         groups.draw(screen)
         dialog_window_group.draw(screen)
         arrow_group.update()

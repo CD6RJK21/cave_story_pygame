@@ -2,9 +2,6 @@ import math
 from graphics import *
 
 
-TILESIZE = 32
-
-
 class FirstCaveBat:
     def __init__(self, x, y):
         self.x = x

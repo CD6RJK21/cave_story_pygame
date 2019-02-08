@@ -2,10 +2,9 @@ import pygame
 from graphics import *
 from player import *
 
+
 BACKGROUNDTILE = 128
-TILESIZE = 32
 TILETYPE = ['air', 'wall']
-WIDTH, HEIGHT = 640, 480
 
 
 def create_test_map():
