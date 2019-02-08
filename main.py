@@ -31,6 +31,11 @@ maap.background(test_map[1])
 
 bat = FirstCaveBat(6*32, 3*32)
 
+all_sprites.add(*maap.backdrop_group.sprites(), *maap.foreground_group.sprites(), *maap.background_group.sprites(),
+                *player.damage_group.sprites(), *player.player_group.sprites(), *bat.sprite_group.sprites(),
+                *player.health_background_group.sprites(), *player.health_foreground.sprites(),
+                *player.health_number_group.sprites())
+
 running = True
 pygame.mixer.music.load('data/music/gestation.mp3')
 pygame.mixer.music.play(-1)
@@ -44,7 +49,7 @@ while running:
             if pressed[pygame.K_F4] and pressed[pygame.K_LALT]:
                 exit()  # TODO: make exit dialog window
             if event.key == pygame.K_ESCAPE:
-                quit_menu(screen, resolution)
+                quit_menu(screen, resolution, all_sprites)
                 continue
             # if pressed[pygame.K_RIGHT] and pressed[pygame.K_LEFT]:
             #     player.stop_running()
@@ -74,8 +79,6 @@ while running:
                 player.interacting = False
             elif event.key == pygame.K_z:
                 player.stop_jump()
-    all_sprites.update()
-    all_sprites.draw(screen)
     maap.draw_background(screen)
     bat.update(player)
     bat.draw(screen)

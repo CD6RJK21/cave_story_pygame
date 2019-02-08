@@ -68,7 +68,7 @@ def main_menu(screen):
         return 'load'
 
 
-def quit_menu(screen, resolution):
+def quit_menu(screen, resolution, groups):
     clock = pygame.time.Clock()
     move_sound = pygame.mixer.Sound('data/sound/menu_move.wav')
     dialog_window_group = pygame.sprite.Group()
@@ -121,6 +121,7 @@ def quit_menu(screen, resolution):
             arrow.rect.y = dialog_window.rect.y + 20
             if dialog_window.rect.x <= resolution[0] - dialog_window.rect.width:
                 slide = True
+        groups.draw(screen)
         dialog_window_group.draw(screen)
         arrow_group.update()
         arrow_group.draw(screen)
