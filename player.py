@@ -355,6 +355,8 @@ class Player(pygame.sprite.Sprite):
                 self.damage = 0
                 self.health_number.update_num(self.health_current)
 
+        self.polar_star.update_bullets()
+
 
         if len(self.frames) > 1:
             self.time += 1

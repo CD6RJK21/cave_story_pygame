@@ -46,6 +46,9 @@ class PolarStar:
     class Bullet(pygame.sprite.Sprite):
         def __init__(self, group, x, y, direction, look):
             super().__init__(group)
+            self.offset = 0
+            self.max_offset = 3.5 * TILESIZE
+            self.speed = 10
             self.direction = direction
             self.look = look
             self.x = x
@@ -60,7 +63,18 @@ class PolarStar:
             self.rect.x, self.rect.y = x, y
 
         def update(self):
-            pass
+            self.offset += self.speed
+            if self.look == 'fwd':
+                if self.direction == 'left':
+                    self.rect.x -= self.speed
+                else:
+                    self.rect.x += self.speed
+            elif self.look == 'up':
+                self.rect.y -= self.speed
+            elif self.look == 'down':
+                self.rect.y += self.speed
+            if self.offset >= self.max_offset:
+                self.kill()
 
     def start_fire(self, x, y, direction, look):
         bullet_y = self.gun_y(look, y) - TILESIZE / 2
@@ -101,6 +115,8 @@ class PolarStar:
         self.direction = self.state.split('_')[0]
         self.look = self.state.split('_')[1]
         self.sprite.image = self.images[state]
+
+    def update_bullets(self):
         self.bullets_group.update()
 
     def draw(self, screen, x, y, motion, time, update_time):
