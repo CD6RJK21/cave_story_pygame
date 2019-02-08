@@ -125,7 +125,7 @@ def quit_menu(screen, resolution, groups):
         dialog_window_group.draw(screen)
         arrow_group.update()
         arrow_group.draw(screen)
-        clock.tick(120)
+        clock.tick(FPS)
         pygame.display.flip()
 
 

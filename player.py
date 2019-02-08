@@ -316,19 +316,20 @@ class Player(pygame.sprite.Sprite):
         return not (self.invincible and self.invincible_time // self.invincible_flash_time % 2 == 0)
 
     def stop_running(self):
-        # while self.speed_x > 0:
-        #     self.speed_x -= self.slowdown
         self.acceleration = 0
         self.motion = 'staying'
-        # if self.direction == 'left':
-        #     self.set_sprite('staying_left')
-        # elif self.direction == 'right':
-        #     self.set_sprite('staying_right')
+
+    def start_fire(self):
+        self.polar_star.start_fire(self.rect.x, self.rect.y, self.direction, self.look)
+
+    def stop_fire(self):
+        self.polar_star.stop_fire(self.direction, self.look)
 
     def draw(self, screen):
         if self.sprite_is_visible():
             self.polar_star.draw(screen, self.rect.x, self.rect.y, self.motion, self.time, self.update_time)
             self.player_group.draw(screen)
+        self.polar_star.bullets_group.draw(screen)
 
     def drawHUD(self, screen):
         if self.sprite_is_visible():

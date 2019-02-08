@@ -66,6 +66,8 @@ while running:
                 player.start_running_right()
             elif event.key == pygame.K_z:
                 player.start_jump()
+            elif event.key == pygame.K_x:
+                player.start_fire()
         if event.type == pygame.KEYUP:
             pressed = pygame.key.get_pressed()
             if event.key == pygame.K_LEFT and not pressed[pygame.K_RIGHT]:
@@ -79,6 +81,8 @@ while running:
                 player.interacting = False
             elif event.key == pygame.K_z:
                 player.stop_jump()
+            elif event.key == pygame.K_x:
+                player.stop_fire()
     maap.draw_background(screen)
     bat.update(player)
     bat.draw(screen)

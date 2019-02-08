@@ -9,7 +9,6 @@ class PolarStar:
         self.offsets = {'up': 2, 'down': 4, 'fwd': 0, 'left': 0, 'right': 1}
         self.sprite_group = pygame.sprite.Group()
         self.sprite = pygame.sprite.Sprite(self.sprite_group)
-        self.images = cut_sheet(load_image('polar_star.png'), 1, 6, [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0]])
         self.images = {'left_fwd': cut_image_one(load_image('Arms.png'),
                                                  (GUNWIDTH * 2, 0), (GUNWIDTH * 3, GUNHEIGHT)),
                        'right_fwd': cut_image_one(load_image('Arms.png'),
@@ -22,12 +21,78 @@ class PolarStar:
                                                   (GUNWIDTH * 2, GUNHEIGHT * 4), (GUNWIDTH * 3, GUNHEIGHT * 5)),
                        'right_down': cut_image_one(load_image('Arms.png'),
                                                    (GUNWIDTH * 2, GUNHEIGHT * 5), (GUNWIDTH * 3, GUNHEIGHT * 6))}
+        self.nozzle = {'left_fwd': (10, 23), 'right_fwd': (38, 23), 'left_up': (27, 4), 'right_up': (21, 4),
+                       'left_down': (29, 28), 'right_down': (19, 28)}
         self.state = 'right_fwd'
         self.direction = self.state.split('_')[0]
         self.look = self.state.split('_')[1]
         self.sprite.image = self.images[self.state]
         self.sprite.rect = self.sprite.image.get_rect()
         self.time = 0
+
+        self.bullets_group = pygame.sprite.Group()
+
+    def gun_x(self, direction, player_x):
+        return player_x - TILESIZE / 2 if direction == 'left' else player_x
+
+    def gun_y(self, look, player_y):
+        y = player_y
+        if look == 'up':
+            y -= TILESIZE / 4
+        elif look == 'down':
+            y += TILESIZE / 4
+        return y
+
+    class Bullet(pygame.sprite.Sprite):
+        def __init__(self, group, x, y, direction, look):
+            super().__init__(group)
+            self.direction = direction
+            self.look = look
+            self.x = x
+            self.y = y
+            if look == 'fwd':
+                self.image = cut_image_one(load_image('Bullet.png'),
+                                           (TILESIZE * 8, GUNHEIGHT * 2), (TILESIZE * 9, TILESIZE * 3))
+            else:
+                self.image = cut_image_one(load_image('Bullet.png'),
+                                           (TILESIZE * 9, GUNHEIGHT * 2), (TILESIZE * 10, TILESIZE * 3))
+            self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = x, y
+
+        def update(self):
+            pass
+
+    def start_fire(self, x, y, direction, look):
+        bullet_y = self.gun_y(look, y) - TILESIZE / 2
+        bullet_x = self.gun_x(direction, x) - TILESIZE / 2
+        if self.look == 'fwd':
+            bullet_y += self.nozzle['left_fwd'][1]
+            if self.direction == 'left':
+                bullet_x += self.nozzle['left_fwd'][0]
+            else:
+                bullet_x += self.nozzle['right_fwd'][0]
+        elif self.look == 'up':
+            bullet_y += self.nozzle['left_up'][1]
+            if self.direction == 'left':
+                bullet_x += self.nozzle['left_up'][0]
+            else:
+                bullet_x += self.nozzle['right_up'][0]
+        elif self.look == 'down':
+            bullet_y += self.nozzle['left_down'][1]
+            if self.direction == 'left':
+                bullet_x += self.nozzle['left_down'][0]
+            else:
+                bullet_x += self.nozzle['right_down'][0]
+        bullet = self.Bullet(self.bullets_group, bullet_x, bullet_y, direction, look)
+        # if self.look == 'fwd':
+        #     self.fwd_bullet.rect.x, self.fwd_bullet.rect.y = bullet_x, bullet_y
+        #     self.bullets_group_fwd.draw(screen)
+        # else:
+        #     self.up_bullet.rect.x, self.up_bullet.rect.y = bullet_x, bullet_y
+        #     self.bullets_group_up.draw(screen)
+
+    def stop_fire(self, direction, look):
+        pass
 
     def update(self, state):
         if state == self.state:
@@ -36,14 +101,12 @@ class PolarStar:
         self.direction = self.state.split('_')[0]
         self.look = self.state.split('_')[1]
         self.sprite.image = self.images[state]
+        self.bullets_group.update()
 
     def draw(self, screen, x, y, motion, time, update_time):
-        if self.direction == 'left':
-            x -= TILESIZE / 2
-        if self.look == 'up':
-            y -= TILESIZE / 4
-        elif self.look == 'down':
-            y += TILESIZE / 4
+        x = self.gun_x(self.direction, x)
+        y = self.gun_y(self.look, y)
+
         if motion == 'running':  # delete this, if game lags
             if update_time - 1 <= time:
                 self.time = (self.time + 1) % 2
