@@ -129,8 +129,12 @@ def quit_menu(screen, resolution, groups):
         pygame.display.flip()
 
 
-
-
-
-
-
+def loading_screen(screen):
+    support_group = pygame.sprite.Group()
+    screen.fill((0, 0, 0))
+    loading = pygame.sprite.Sprite(support_group)
+    loading.image = load_image('Loading.png')
+    loading.rect = loading.image.get_rect()
+    loading.rect.x, loading.rect.y = WIDTH / 2 - loading.rect.width / 2, HEIGHT / 2 - loading.rect.height / 2
+    support_group.draw(screen)
+    pygame.display.flip()

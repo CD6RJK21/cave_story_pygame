@@ -46,10 +46,52 @@ def create_test_map():
     return tiles, background_tiles
 
 
+def load_first_cave():
+    translator = {'1': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0],
+                  'q': cut_level(load_image('PrtCave.png'), 5, 16, [[2, 0]])[0],
+                  'w': cut_level(load_image('PrtCave.png'), 5, 16, [[2, 1]])[0],
+                  'a': cut_level(load_image('PrtCave.png'), 5, 16, [[3, 0]])[0],
+                  's': cut_level(load_image('PrtCave.png'), 5, 16, [[3, 1]])[0],
+                  'e': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 2]])[0],
+                  'r': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 3]])[0],
+                  't': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 4]])[0],
+                  'y': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 5]])[0],
+                  'd': cut_level(load_image('PrtCave.png'), 5, 16, [[1, 2]])[0],
+                  'f': cut_level(load_image('PrtCave.png'), 5, 16, [[1, 3]])[0],
+                  'g': cut_level(load_image('PrtCave.png'), 5, 16, [[1, 4]])[0],
+                  'h': cut_level(load_image('PrtCave.png'), 5, 16, [[1, 5]])[0],
+                  'j': cut_level(load_image('PrtCave.png'), 5, 16, [[2, 3]])[0],
+                  'k': cut_level(load_image('PrtCave.png'), 5, 16, [[2, 4]])[0],
+                  'n': cut_level(load_image('PrtCave.png'), 5, 16, [[3, 3]])[0],
+                  'm': cut_level(load_image('PrtCave.png'), 5, 16, [[3, 4]])[0],
+                  'u': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 6]])[0],
+                  'i': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 7]])[0],
+                  'o': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 8]])[0],
+                  'p': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 9]])[0],
+                  '[': cut_level(load_image('PrtCave.png'), 5, 16, [[1, 6]])[0],
+                  ']': cut_level(load_image('PrtCave.png'), 5, 16, [[1, 7]])[0],
+                  }
+    with open('data/levels/first_cave.txt', encoding='utf-8') as file:
+        file = file.readlines()
+        level_map = file[:]
+    level_map = [line.replace('\ufeff', '').replace('\n', '') for line in level_map]
+    rows = len(level_map)
+    cols = len(level_map[0])
+    tiles = [[Tile() for _ in range(cols)] for k in range(rows)]
+    for row in range(rows):
+        for col in range(cols):
+            if not level_map[row][col] == '0':
+                tiles[row][col].type = 'wall'
+                tiles[row][col].sprite = pygame.sprite.Sprite()
+                tiles[row][col].sprite.image = translator[level_map[row][col]]
+    background_tiles = [[0 for _ in range(cols)] for k in range(rows)]
+    return tiles, background_tiles
+
+
 class Tile:
     def __init__(self, tile_type='air', sprite=0):
         if sprite == 0:
-            self.sprite = cut_image_one(load_image('PrtCave.png'), (0, 0), (32, 32))
+            self.sprite = cut_image_one(load_image('PrtCave.png'), (0, 0), (32, 32))  # TODO: fix default tile sprite
         self.type = tile_type
         self.sprite = sprite
 

@@ -12,28 +12,22 @@ pygame.init()
 screen = pygame.display.set_mode(resolution)  # , pygame.FULLSCREEN
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
-player = Player((50, 50))
+player = Player((8 * TILESIZE, 11 * TILESIZE))
+player.rect.x, player.rect.y = 8 * TILESIZE, 11 * TILESIZE
 main_menu_res = main_menu(screen)
 
-support_group = pygame.sprite.Group()
-screen.fill((0, 0, 0))
-loading = pygame.sprite.Sprite(support_group)
-loading.image = load_image('Loading.png')
-loading.rect = loading.image.get_rect()
-loading.rect.x, loading.rect.y = WIDTH / 2 - loading.rect.width / 2, HEIGHT / 2 - loading.rect.height / 2
-support_group.draw(screen)
-pygame.display.flip()
+loading_screen(screen)
 
-test_map = create_test_map()
+test_map = load_first_cave()
 maap = Map(test_map[0])
 maap.FixedBackdrop(load_image('bkBlue.png'))
 maap.background(test_map[1])
 
 enemies = pygame.sprite.Group()
-bat = FirstCaveBat(enemies, 6*32, 3*32)
+bat = FirstCaveBat(enemies, 6*TILESIZE, 3*TILESIZE)
 
 all_sprites.add(*maap.backdrop_group.sprites(), *maap.foreground_group.sprites(), *maap.background_group.sprites(),
-                *player.damage_group.sprites(), *player.player_group.sprites(), *bat.sprite_group.sprites(),
+                *player.damage_group.sprites(), *player.player_group.sprites(), *enemies.sprites(),
                 *player.health_background_group.sprites(), *player.health_foreground.sprites(),
                 *player.health_number_group.sprites())
 

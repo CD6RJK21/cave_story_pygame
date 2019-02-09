@@ -357,6 +357,7 @@ class Player(pygame.sprite.Sprite):
 
         self.polar_star.update_bullets(maap, enemies)
 
+
         if len(self.frames) > 1:
             self.time += 1
             if self.time >= self.update_time:
