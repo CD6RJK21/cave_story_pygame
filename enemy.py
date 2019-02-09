@@ -3,7 +3,7 @@ from graphics import *
 
 
 class FirstCaveBat:
-    def __init__(self, x, y):
+    def __init__(self, group, x, y):
         self.x = x
         self.y = y
         self.update_time = 3
@@ -11,7 +11,7 @@ class FirstCaveBat:
         self.time = 0
 
         self.image = load_image('bat.png')
-        self.sprite_group = pygame.sprite.Group()
+        self.sprite_group = group
         self.sprite = pygame.sprite.Sprite(self.sprite_group)
 
         self.direction = 'right'
@@ -37,7 +37,6 @@ class FirstCaveBat:
             self.sprite.image = self.frames[0]
 
     def draw(self, screen):
-        self.sprite.rect.y = self.y + 5 * TILESIZE / 2 * math.sin(self.flight_angle/180)
         self.sprite_group.draw(screen)
 
     def update(self, player):
@@ -52,3 +51,4 @@ class FirstCaveBat:
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.sprite.image = self.frames[self.cur_frame]
             self.time = 0
+        self.sprite.rect.y = self.y + 5 * TILESIZE / 2 * math.sin(self.flight_angle / 180)

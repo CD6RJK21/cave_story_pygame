@@ -29,7 +29,8 @@ maap = Map(test_map[0])
 maap.FixedBackdrop(load_image('bkBlue.png'))
 maap.background(test_map[1])
 
-bat = FirstCaveBat(6*32, 3*32)
+enemies = pygame.sprite.Group()
+bat = FirstCaveBat(enemies, 6*32, 3*32)
 
 all_sprites.add(*maap.backdrop_group.sprites(), *maap.foreground_group.sprites(), *maap.background_group.sprites(),
                 *player.damage_group.sprites(), *player.player_group.sprites(), *bat.sprite_group.sprites(),
@@ -85,7 +86,7 @@ while running:
                 player.stop_fire()
     maap.draw_background(screen)
     bat.update(player)
-    bat.draw(screen)
+    enemies.draw(screen)
     player.update(maap)
     player.draw(screen)
     if player.damage_rectangle().collide_width(bat.damage_rectangle()):
