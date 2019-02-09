@@ -320,7 +320,7 @@ class Player(pygame.sprite.Sprite):
         self.motion = 'staying'
 
     def start_fire(self):
-        self.polar_star.start_fire(self.rect.x, self.rect.y, self.direction, self.look)
+        self.polar_star.start_fire(self.rect.x, self.rect.y, self.direction, self.look, self.motion)
 
     def stop_fire(self):
         self.polar_star.stop_fire(self.direction, self.look)
@@ -355,7 +355,7 @@ class Player(pygame.sprite.Sprite):
                 self.damage = 0
                 self.health_number.update_num(self.health_current)
 
-        self.polar_star.update_bullets()
+        self.polar_star.update_bullets(maap)
 
 
         if len(self.frames) > 1:

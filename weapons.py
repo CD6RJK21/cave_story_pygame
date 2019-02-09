@@ -62,7 +62,19 @@ class PolarStar:
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = x, y
 
-        def update(self):
+        def collision_rectangle(self):
+            width = TILESIZE if self.look == 'fwd' else 4
+            height = TILESIZE if self.look != 'fwd' else 4
+            return Rectangle(self.rect.x + TILESIZE / 2 - width / 2, self.rect.y + TILESIZE / 2 - height / 2,
+                             width, height)
+
+        def update(self, maap):
+            tiles = maap.get_colliding_tiles(self.collision_rectangle())
+            for i in range(len(tiles)):
+                if tiles[i].type == 'wall':
+                    self.kill()
+                    return False
+
             self.offset += self.speed
             if self.look == 'fwd':
                 if self.direction == 'left':
@@ -76,27 +88,35 @@ class PolarStar:
             if self.offset >= self.max_offset:
                 self.kill()
 
-    def start_fire(self, x, y, direction, look):
+    def start_fire(self, x, y, direction, look, motion):
         bullet_y = self.gun_y(look, y) - TILESIZE / 2
         bullet_x = self.gun_x(direction, x) - TILESIZE / 2
-        if self.look == 'fwd':
+        if look == 'fwd':
             bullet_y += self.nozzle['left_fwd'][1]
             if self.direction == 'left':
                 bullet_x += self.nozzle['left_fwd'][0]
             else:
                 bullet_x += self.nozzle['right_fwd'][0]
-        elif self.look == 'up':
+        elif look == 'up':
             bullet_y += self.nozzle['left_up'][1]
             if self.direction == 'left':
                 bullet_x += self.nozzle['left_up'][0]
             else:
                 bullet_x += self.nozzle['right_up'][0]
-        elif self.look == 'down':
-            bullet_y += self.nozzle['left_down'][1]
-            if self.direction == 'left':
-                bullet_x += self.nozzle['left_down'][0]
+        elif look == 'down':
+            if motion == 'staying' or motion == 'running':
+                look = 'fwd'
+                bullet_y += self.nozzle['left_fwd'][1] * 0.65
+                if self.direction == 'left':
+                    bullet_x += self.nozzle['left_fwd'][0]
+                else:
+                    bullet_x += self.nozzle['right_fwd'][0]
             else:
-                bullet_x += self.nozzle['right_down'][0]
+                bullet_y += self.nozzle['left_down'][1]
+                if self.direction == 'left':
+                    bullet_x += self.nozzle['left_down'][0]
+                else:
+                    bullet_x += self.nozzle['right_down'][0]
         bullet = self.Bullet(self.bullets_group, bullet_x, bullet_y, direction, look)
         # if self.look == 'fwd':
         #     self.fwd_bullet.rect.x, self.fwd_bullet.rect.y = bullet_x, bullet_y
@@ -116,8 +136,8 @@ class PolarStar:
         self.look = self.state.split('_')[1]
         self.sprite.image = self.images[state]
 
-    def update_bullets(self):
-        self.bullets_group.update()
+    def update_bullets(self, maap):
+        self.bullets_group.update(maap)
 
     def draw(self, screen, x, y, motion, time, update_time):
         x = self.gun_x(self.direction, x)
