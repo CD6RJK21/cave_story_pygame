@@ -339,7 +339,7 @@ class Player(pygame.sprite.Sprite):
             if self.damage > 0:
                 self.damage_group.draw(screen)
 
-    def update(self, maap):
+    def update(self, maap, enemies):
         self.set_current_sprite_state()
         self.updatex(maap)
         self.updatey(maap)
@@ -355,8 +355,7 @@ class Player(pygame.sprite.Sprite):
                 self.damage = 0
                 self.health_number.update_num(self.health_current)
 
-        self.polar_star.update_bullets(maap)
-
+        self.polar_star.update_bullets(maap, enemies)
 
         if len(self.frames) > 1:
             self.time += 1

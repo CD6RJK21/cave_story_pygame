@@ -2,8 +2,9 @@ import math
 from graphics import *
 
 
-class FirstCaveBat:
+class FirstCaveBat(pygame.sprite.Sprite):
     def __init__(self, group, x, y):
+        super().__init__(group)
         self.x = x
         self.y = y
         self.update_time = 3
@@ -12,19 +13,25 @@ class FirstCaveBat:
 
         self.image = load_image('bat.png')
         self.sprite_group = group
-        self.sprite = pygame.sprite.Sprite(self.sprite_group)
 
         self.direction = 'right'
         self.set_sprite('left')
-        self.sprite.rect = self.sprite.image.get_rect()
-        self.sprite.rect.x = self.x
-        self.sprite.rect.y = self.y
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
 
         self.angular_speed = 5
         self.flight_angle = 0.0
 
+        self.max_health = 1
+        self.health_current = self.max_health
+        self.damage = 1
+
+    def take_damage(self, damage):
+        self.health_current -= damage
+
     def damage_rectangle(self):
-        return Rectangle(self.sprite.rect.center[0], self.sprite.rect.center[1], 1, 1)
+        return Rectangle(self.rect.center[0], self.rect.center[1], 1, 1)
 
     def set_sprite(self, state):
         if self.direction != state:
@@ -34,13 +41,17 @@ class FirstCaveBat:
             self.direction = state
             self.frames = sprites[state]
             self.state = state
-            self.sprite.image = self.frames[0]
+            self.image = self.frames[0]
+            self.mask = pygame.mask.from_surface(self.image)
 
     def draw(self, screen):
         self.sprite_group.draw(screen)
 
     def update(self, player):
-        if self.sprite.rect.center[0] < player.rect.center[0]:
+        if self.health_current <= 0:
+            self.kill()
+
+        if self.rect.center[0] < player.rect.center[0]:
             self.set_sprite('right')
         else:
             self.set_sprite('left')
@@ -49,6 +60,6 @@ class FirstCaveBat:
         self.time += 1
         if self.time >= self.update_time:
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
-            self.sprite.image = self.frames[self.cur_frame]
+            self.image = self.frames[self.cur_frame]
             self.time = 0
-        self.sprite.rect.y = self.y + 5 * TILESIZE / 2 * math.sin(self.flight_angle / 180)
+        self.rect.y = self.y + 5 * TILESIZE / 2 * math.sin(self.flight_angle / 180)

@@ -61,6 +61,7 @@ class PolarStar:
                                            (TILESIZE * 9, GUNHEIGHT * 2), (TILESIZE * 10, TILESIZE * 3))
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = x, y
+            self.mask = pygame.mask.from_surface(self.image)
 
         def collision_rectangle(self):
             width = TILESIZE if self.look == 'fwd' else 4
@@ -68,7 +69,12 @@ class PolarStar:
             return Rectangle(self.rect.x + TILESIZE / 2 - width / 2, self.rect.y + TILESIZE / 2 - height / 2,
                              width, height)
 
-        def update(self, maap):
+        def update(self, maap, enemies):
+            for enemy in enemies.sprites():
+                if pygame.sprite.collide_mask(self, enemy):
+                    self.kill()
+                    enemy.take_damage(1)
+
             tiles = maap.get_colliding_tiles(self.collision_rectangle())
             for i in range(len(tiles)):
                 if tiles[i].type == 'wall':
@@ -136,8 +142,8 @@ class PolarStar:
         self.look = self.state.split('_')[1]
         self.sprite.image = self.images[state]
 
-    def update_bullets(self, maap):
-        self.bullets_group.update(maap)
+    def update_bullets(self, maap, enemies):
+        self.bullets_group.update(maap, enemies)
 
     def draw(self, screen, x, y, motion, time, update_time):
         x = self.gun_x(self.direction, x)

@@ -85,12 +85,15 @@ while running:
             elif event.key == pygame.K_x:
                 player.stop_fire()
     maap.draw_background(screen)
-    bat.update(player)
+    enemies.update(player)
     enemies.draw(screen)
-    player.update(maap)
+    player.update(maap, enemies)
     player.draw(screen)
-    if player.damage_rectangle().collide_width(bat.damage_rectangle()):
-        player.take_damage(1)
+
+    for enemy in enemies.sprites():
+        if player.damage_rectangle().collide_width(enemy.damage_rectangle()):
+            player.take_damage(enemy.damage)
+
     maap.update()
     maap.draw(screen)
     player.drawHUD(screen)
