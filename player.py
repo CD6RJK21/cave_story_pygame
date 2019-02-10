@@ -8,7 +8,8 @@ class Player(pygame.sprite.Sprite):
         super().__init__(self.player_group)
         self.sound = {'running': pygame.mixer.Sound('data/sound/quote_walk.wav'),
                       'head_bump': pygame.mixer.Sound('data/sound/quote_bonkhead.wav'),
-                      'jumping': pygame.mixer.Sound('data/sound/quote_jump.wav')
+                      'jumping': pygame.mixer.Sound('data/sound/quote_jump.wav'),
+                      'quote_hurt': pygame.mixer.Sound('data/sound/quote_hurt.wav')
                       }
         self.rectangle_x = Rectangle(6, 10, 20, 12)
         self.rectangle_y = Rectangle(10, 2, 12, 30)
@@ -298,6 +299,7 @@ class Player(pygame.sprite.Sprite):
         if self.invincible:
             return
         # self.dead = self.health_current > 0
+        self.sound['quote_hurt'].play()
         self.speed_y = min(-self.shortjump_speed, self.speed_y)
         self.damage = damage
         self.damage_time = 0

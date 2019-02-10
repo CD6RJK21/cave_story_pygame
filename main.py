@@ -8,6 +8,7 @@ TILESIZE = 32
 FPS = 60
 resolution = WIDTH, HEIGHT = 640, 480
 
+pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.init()
 screen = pygame.display.set_mode(resolution)  # , pygame.FULLSCREEN
 clock = pygame.time.Clock()
@@ -24,7 +25,7 @@ maap.FixedBackdrop(load_image('bkBlue.png'))
 maap.background(test_map[1])
 
 enemies = pygame.sprite.Group()
-bat = FirstCaveBat(enemies, 6*TILESIZE, 3*TILESIZE)
+bat = FirstCaveBat(enemies, 13*TILESIZE, 7*TILESIZE)
 
 all_sprites.add(*maap.backdrop_group.sprites(), *maap.foreground_group.sprites(), *maap.background_group.sprites(),
                 *player.damage_group.sprites(), *player.player_group.sprites(), *enemies.sprites(),

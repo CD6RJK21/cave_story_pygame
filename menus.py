@@ -6,6 +6,7 @@ def main_menu(screen):
     songs = ['data/music/curly.mp3']
     title_image = load_image('title.png')
     move_sound = pygame.mixer.Sound('data/sound/menu_move.wav')
+    prompt_sound = pygame.mixer.Sound('data/sound/menu_prompt.wav')
     running = True
     menu_sprites = pygame.sprite.Group()
     title = pygame.sprite.Sprite(menu_sprites)
@@ -63,14 +64,17 @@ def main_menu(screen):
         pygame.display.flip()
     pygame.mixer.music.stop()
     if active_button == 'new':
+        prompt_sound.play()
         return 'new'
     elif active_button == 'load':
+        prompt_sound.play()
         return 'load'
 
 
 def quit_menu(screen, resolution, groups):
     clock = pygame.time.Clock()
     move_sound = pygame.mixer.Sound('data/sound/menu_move.wav')
+    prompt_sound = pygame.mixer.Sound('data/sound/menu_prompt.wav')
     dialog_window_group = pygame.sprite.Group()
     dialog_window = pygame.sprite.Sprite(dialog_window_group)
     dialog_window.image = cut_image_one(load_image('TextBox.png'), (310, 102), (463, 153))
@@ -127,6 +131,7 @@ def quit_menu(screen, resolution, groups):
         arrow_group.draw(screen)
         clock.tick(FPS)
         pygame.display.flip()
+    prompt_sound.play()
 
 
 def loading_screen(screen):

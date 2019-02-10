@@ -27,7 +27,10 @@ class FirstCaveBat(pygame.sprite.Sprite):
         self.health_current = self.max_health
         self.damage = 1
 
+        self.sound = {'enemy_hurt_cool': pygame.mixer.Sound('data/sound/enemy_hurt_cool.wav')}
+
     def take_damage(self, damage):
+        self.sound['enemy_hurt_cool'].play()
         self.health_current -= damage
 
     def damage_rectangle(self):
