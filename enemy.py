@@ -5,13 +5,14 @@ from graphics import *
 class FirstCaveBat(pygame.sprite.Sprite):
     def __init__(self, group, x, y):
         super().__init__(group)
+        self.image_file = load_image('bat.png')
+        self.sound = {'enemy_hurt_cool': pygame.mixer.Sound('data/sound/enemy_hurt_cool.wav')}
         self.x = x
         self.y = y
         self.update_time = 3
         self.cur_frame = 0
         self.time = 0
 
-        self.image = load_image('bat.png')
         self.sprite_group = group
 
         self.direction = 'right'
@@ -27,7 +28,6 @@ class FirstCaveBat(pygame.sprite.Sprite):
         self.health_current = self.max_health
         self.damage = 1
 
-        self.sound = {'enemy_hurt_cool': pygame.mixer.Sound('data/sound/enemy_hurt_cool.wav')}
 
     def take_damage(self, damage):
         self.sound['enemy_hurt_cool'].play()
@@ -38,8 +38,8 @@ class FirstCaveBat(pygame.sprite.Sprite):
 
     def set_sprite(self, state):
         if self.direction != state:
-            sprites = {'left': cut_sheet(self.image, 6, 2, [[0, 2], [0, 4], [0, 3], [0, 4]]),
-                       'right': cut_sheet(self.image, 6, 2, [[1, 2], [1, 4], [1, 3], [1, 4]])
+            sprites = {'left': cut_sheet(self.image_file, 6, 2, [[0, 2], [0, 4], [0, 3], [0, 4]]),
+                       'right': cut_sheet(self.image_file, 6, 2, [[1, 2], [1, 4], [1, 3], [1, 4]])
                        }
             self.direction = state
             self.frames = sprites[state]
