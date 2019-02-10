@@ -127,8 +127,12 @@ class Player(pygame.sprite.Sprite):
             #         self.speed_x = 0
             # if self.speed_x < 0:
             #     self.speed_x *= self.slowdown * 0.13
-            self.speed_x = max(0.0, self.speed_x - self.friction) \
-                if self.speed_x > 0 else min(0.0, self.speed_x + self.friction + 0.08)
+            if self.on_ground:
+                self.speed_x = max(0.0, self.speed_x - self.friction) \
+                    if self.speed_x > 0 else min(0.0, self.speed_x + self.friction + 0.08)
+            else:
+                self.speed_x = max(0.0, self.speed_x - self.friction * 0.4) \
+                    if self.speed_x > 0 else min(0.0, self.speed_x + self.friction * 0.4 + 0.08)
 
         delta = self.speed_x
         # Running to right

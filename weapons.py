@@ -65,6 +65,9 @@ class PolarStar:
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = x, y
             self.mask = pygame.mask.from_surface(self.image)
+            self.wall_collided = False
+            self.ttl = 0
+            self.ttl_max = TILESIZE
 
         def collision_rectangle(self):
             width = TILESIZE if self.look == 'fwd' else 4
@@ -81,6 +84,10 @@ class PolarStar:
             tiles = maap.get_colliding_tiles(self.collision_rectangle())
             for i in range(len(tiles)):
                 if tiles[i].type == 'wall':
+                    self.wall_collided = True
+            if self.wall_collided:
+                self.ttl += self.speed
+                if self.ttl >= self.ttl_max:
                     self.kill()
                     return False
 

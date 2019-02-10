@@ -4,7 +4,8 @@ from player import *
 
 
 BACKGROUNDTILE = 128
-TILETYPE = ['air', 'wall']
+TILETYPE = ['air', 'wall', 'slope']
+SLOPETYPE = ['ltt', 'lts', 'rts', 'rtt', 'lbt', 'lbs', 'rbs', 'rbt']
 
 
 def create_test_map():
@@ -47,29 +48,29 @@ def create_test_map():
 
 
 def load_first_cave():
-    translator = {'1': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0],
-                  'q': cut_level(load_image('PrtCave.png'), 5, 16, [[2, 0]])[0],
-                  'w': cut_level(load_image('PrtCave.png'), 5, 16, [[2, 1]])[0],
-                  'a': cut_level(load_image('PrtCave.png'), 5, 16, [[3, 0]])[0],
-                  's': cut_level(load_image('PrtCave.png'), 5, 16, [[3, 1]])[0],
-                  'e': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 2]])[0],
-                  'r': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 3]])[0],
-                  't': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 4]])[0],
-                  'y': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 5]])[0],
-                  'd': cut_level(load_image('PrtCave.png'), 5, 16, [[1, 2]])[0],
-                  'f': cut_level(load_image('PrtCave.png'), 5, 16, [[1, 3]])[0],
-                  'g': cut_level(load_image('PrtCave.png'), 5, 16, [[1, 4]])[0],
-                  'h': cut_level(load_image('PrtCave.png'), 5, 16, [[1, 5]])[0],
-                  'j': cut_level(load_image('PrtCave.png'), 5, 16, [[2, 3]])[0],
-                  'k': cut_level(load_image('PrtCave.png'), 5, 16, [[2, 4]])[0],
-                  'n': cut_level(load_image('PrtCave.png'), 5, 16, [[3, 3]])[0],
-                  'm': cut_level(load_image('PrtCave.png'), 5, 16, [[3, 4]])[0],
-                  'u': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 6]])[0],
-                  'i': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 7]])[0],
-                  'o': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 8]])[0],
-                  'p': cut_level(load_image('PrtCave.png'), 5, 16, [[0, 9]])[0],
-                  '[': cut_level(load_image('PrtCave.png'), 5, 16, [[1, 6]])[0],
-                  ']': cut_level(load_image('PrtCave.png'), 5, 16, [[1, 7]])[0],
+    translator = {'1': (cut_level(load_image('PrtCave.png'), 5, 16, [[0, 1]])[0], 'wall'),
+                  'q': (cut_level(load_image('PrtCave.png'), 5, 16, [[2, 0]])[0], 'wall'),
+                  'w': (cut_level(load_image('PrtCave.png'), 5, 16, [[2, 1]])[0], 'wall'),
+                  'a': (cut_level(load_image('PrtCave.png'), 5, 16, [[3, 0]])[0], 'wall'),
+                  's': (cut_level(load_image('PrtCave.png'), 5, 16, [[3, 1]])[0], 'wall'),
+                  'e': (cut_level(load_image('PrtCave.png'), 5, 16, [[0, 2]])[0], 'slope', 'ltt'),
+                  'r': (cut_level(load_image('PrtCave.png'), 5, 16, [[0, 3]])[0], 'slope', 'lts'),
+                  't': (cut_level(load_image('PrtCave.png'), 5, 16, [[0, 4]])[0], 'slope', 'rts'),
+                  'y': (cut_level(load_image('PrtCave.png'), 5, 16, [[0, 5]])[0], 'slope', 'rtt'),
+                  'd': (cut_level(load_image('PrtCave.png'), 5, 16, [[1, 2]])[0], 'slope', 'lbt'),
+                  'f': (cut_level(load_image('PrtCave.png'), 5, 16, [[1, 3]])[0], 'slope', 'lbs'),
+                  'g': (cut_level(load_image('PrtCave.png'), 5, 16, [[1, 4]])[0], 'slope', 'rbs'),
+                  'h': (cut_level(load_image('PrtCave.png'), 5, 16, [[1, 5]])[0], 'slope', 'rbt'),
+                  'j': (cut_level(load_image('PrtCave.png'), 5, 16, [[2, 3]])[0], 'air'),
+                  'k': (cut_level(load_image('PrtCave.png'), 5, 16, [[2, 4]])[0], 'air'),
+                  'n': (cut_level(load_image('PrtCave.png'), 5, 16, [[3, 3]])[0], 'air'),
+                  'm': (cut_level(load_image('PrtCave.png'), 5, 16, [[3, 4]])[0], 'air'),
+                  'u': (cut_level(load_image('PrtCave.png'), 5, 16, [[0, 6]])[0], 'wall'),
+                  'i': (cut_level(load_image('PrtCave.png'), 5, 16, [[0, 7]])[0], 'wall'),
+                  'o': (cut_level(load_image('PrtCave.png'), 5, 16, [[0, 8]])[0], 'wall'),
+                  'p': (cut_level(load_image('PrtCave.png'), 5, 16, [[0, 9]])[0], 'wall'),
+                  '[': (cut_level(load_image('PrtCave.png'), 5, 16, [[1, 6]])[0], 'wall'),
+                  ']': (cut_level(load_image('PrtCave.png'), 5, 16, [[1, 7]])[0], 'wall'),
                   }
     with open('data/levels/first_cave.txt', encoding='utf-8') as file:
         file = file.readlines()
@@ -81,9 +82,11 @@ def load_first_cave():
     for row in range(rows):
         for col in range(cols):
             if not level_map[row][col] == '0':
-                tiles[row][col].type = 'wall'
+                tiles[row][col].type = translator[level_map[row][col]][1]
+                if translator[level_map[row][col]][1] == 'slope':
+                    tiles[row][col].slope_type = translator[level_map[row][col]][2]
                 tiles[row][col].sprite = pygame.sprite.Sprite()
-                tiles[row][col].sprite.image = translator[level_map[row][col]]
+                tiles[row][col].sprite.image = translator[level_map[row][col]][0]
     background_tiles = [[0 for _ in range(cols)] for k in range(rows)]
     return tiles, background_tiles
 
@@ -94,6 +97,7 @@ class Tile:
             self.sprite = cut_image_one(load_image('PrtCave.png'), (0, 0), (32, 32))  # TODO: fix default tile sprite
         self.type = tile_type
         self.sprite = sprite
+        self.slope_type = ''
 
 
 class CollisionTile:

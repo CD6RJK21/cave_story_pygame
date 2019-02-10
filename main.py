@@ -33,7 +33,7 @@ all_sprites.add(*maap.backdrop_group.sprites(), *maap.foreground_group.sprites()
                 *player.health_number_group.sprites())
 
 running = True
-pygame.mixer.music.load('data/music/gestation.mp3')
+pygame.mixer.music.load('data/music/gestation.mp3')  # TODO: down the music volume
 pygame.mixer.music.play(-1)
 while running:
     screen.fill((0, 0, 0))
