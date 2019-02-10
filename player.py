@@ -74,8 +74,8 @@ class Player(pygame.sprite.Sprite):
 
         self.polar_star = PolarStar()
 
-    def collision_info(self, maap, rectangle):
-        tiles = maap.get_colliding_tiles(rectangle)
+    def collision_info(self, maap, rectangle, direction):
+        tiles = maap.get_colliding_tiles(rectangle, direction)
         info = {'collided': False, 'row': 0, 'col': 0}
         for i in range(len(tiles)):
             if tiles[i].type == 'wall':
@@ -137,26 +137,26 @@ class Player(pygame.sprite.Sprite):
         delta = self.speed_x
         # Running to right
         if delta > 0:
-            info = self.collision_info(maap, self.right_collision(delta))
+            info = self.collision_info(maap, self.right_collision(delta), 'right')
             if info['collided']:
                 self.rect.x = info['col'] * TILESIZE - self.rectangle_x.right
                 self.speed_x = 0
             else:
                 self.rect.x += delta
 
-            info = self.collision_info(maap, self.left_collision(0))
+            info = self.collision_info(maap, self.left_collision(0), 'left')
             if info['collided']:
                 self.rect.x = info['col'] * TILESIZE + TILESIZE / 1.52 + self.rectangle_x.left
         # Running to left
         elif delta < 0:
-            info = self.collision_info(maap, self.left_collision(delta))
+            info = self.collision_info(maap, self.left_collision(delta), 'left')
             if info['collided']:  # TODO: fix a little space between player and tile
                 self.rect.x = info['col'] * TILESIZE + TILESIZE / 1.55 + self.rectangle_x.left
                 self.speed_x = 0
             else:
                 self.rect.x += delta
 
-            info = self.collision_info(maap, self.right_collision(0))
+            info = self.collision_info(maap, self.right_collision(0), 'right')
             if info['collided']:
                 self.rect.x = info['col'] * TILESIZE - self.rectangle_x.right
 
@@ -167,7 +167,7 @@ class Player(pygame.sprite.Sprite):
 
         delta = self.speed_y
         if delta > 0:
-            info = self.collision_info(maap, self.bottom_collision(delta))
+            info = self.collision_info(maap, self.bottom_collision(delta), 'bottom')
             if info['collided']:
                 self.rect.y = info['row'] * TILESIZE - self.rectangle_y.bottom
                 self.speed_y = 0
@@ -176,12 +176,12 @@ class Player(pygame.sprite.Sprite):
                 self.on_ground = False
                 self.rect.y += delta
 
-            info = self.collision_info(maap, self.top_collision(0))
+            info = self.collision_info(maap, self.top_collision(0), 'top')
             if info['collided']:
                 self.sound['head_bump'].play()
                 self.rect.y = info['row'] * TILESIZE + self.rectangle_y.height
         elif delta < 0:
-            info = self.collision_info(maap, self.top_collision(delta))
+            info = self.collision_info(maap, self.top_collision(delta), 'top')
             if info['collided']:
                 self.sound['head_bump'].play()
                 self.rect.y = info['row'] * TILESIZE + TILESIZE + self.rectangle_y.top
@@ -190,7 +190,7 @@ class Player(pygame.sprite.Sprite):
                 self.on_ground = False
                 self.rect.y += delta
 
-            info = self.collision_info(maap, self.bottom_collision(0))
+            info = self.collision_info(maap, self.bottom_collision(0), 'bottom')
             if info['collided']:
                 self.on_ground = True
                 self.rect.y = info['row'] * TILESIZE - self.rectangle_y.bottom

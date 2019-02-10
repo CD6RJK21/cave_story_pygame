@@ -126,6 +126,30 @@ def cut_level(image, rows, columns, chosen=False):
     return frames
 
 
+def opposite_side(direction):
+    if direction == 'top':
+        return 'bottom'
+    elif direction == 'bottom':
+        return 'top'
+    elif direction == 'left':
+        return 'right'
+    return 'left'
+
+
+def get_slope(slope_type):
+    # right_ top =
+    is_positive = slope_type[:2] == 'rt' or slope_type[:2] == 'lb'
+    return 0.5 if is_positive else -0.5
+
+
+def get_offset(slope_type):
+    if slope_type == 'ltt' or slope_type == 'rbs':
+        return TILESIZE
+    if slope_type == 'lbt' or slope_type == 'rts':
+        return 0
+    return TILESIZE // 2
+
+
 class Rectangle:
     def __init__(self, x, y, width, height):
         self.x = x
@@ -136,6 +160,17 @@ class Rectangle:
         self.right = x + width
         self.top = y
         self.bottom = y + height
+        self.center_y = self.top + self.height / 2
+        self.center_x = self.left + self.width / 2
+
+    def get_side(self, side):
+        if side == 'top':
+            return self.top
+        elif side == 'bottom':
+            return self.bottom
+        elif side == 'left':
+            return self.left
+        return self.right
 
     def collide_width(self, rect):
         return self.right >= rect.left and self.left <= rect.right and\

@@ -97,14 +97,40 @@ class Tile:
             self.sprite = cut_image_one(load_image('PrtCave.png'), (0, 0), (32, 32))  # TODO: fix default tile sprite
         self.type = tile_type
         self.sprite = sprite
-        self.slope_type = ''
+        self.slope_type = '000'
 
 
 class CollisionTile:
-    def __init__(self, tile_type, row, col):
+    def __init__(self, tile_type, row, col, slope_type='000'):
         self.type = tile_type
         self.row = row
         self.col = col
+        self.slope_type = slope_type
+
+    def test_collision(self, side, perpendicular_pos, leading_pos, check_slopes=False):
+        if self.type == 'wall':
+            if side == 'top':
+                return self.row * TILESIZE
+            elif side == 'bottom':
+                return (self.row + 1) * TILESIZE
+            elif side == 'left':
+                return self.col * TILESIZE
+            return (self.col + 1) * TILESIZE
+        elif check_slopes and self.type == 'slope':  # check if self type eq to slope type
+            row = self.row * TILESIZE
+            col = self.col * TILESIZE
+            slope = get_slope(self.slope_type)
+            offset = get_offset(self.slope_type)
+            vertical = side == 'top' or side == 'bottom'
+            calculated_pos = slope * (perpendicular_pos - col) + offset + row if vertical else\
+                (perpendicular_pos - row - offset) / slope + col
+            is_colliding = leading_pos <= calculated_pos if side == 'bottom' or\
+                                                            side == 'right' else leading_pos >= calculated_pos
+            if is_colliding:
+                return calculated_pos
+            else:
+                return None
+
 
 
 class Map:
@@ -151,16 +177,31 @@ class Map:
                 backdrop_tile.rect.y = row * BACKGROUNDTILE
                 self.backdrop_group.add(backdrop_tile)
 
-    def get_colliding_tiles(self, rectangle):
-        first_row = rectangle.top / TILESIZE
-        last_row = rectangle.bottom / TILESIZE
-        first_col = rectangle.left / TILESIZE
-        last_col = rectangle.right / TILESIZE
+    def get_colliding_tiles(self, rectangle, direction):
+        horisontal = direction == 'right' or direction == 'left'
+        vertical = direction == 'top' or direction == 'bottom'
+
+        first_primary = rectangle.get_side(opposite_side(direction)) // TILESIZE
+        last_primary = rectangle.get_side(direction) // TILESIZE
+        primary_incr = 1 if direction == 'bottom' or direction == 'right' else -1
+
+        s_min = rectangle.top // TILESIZE if horisontal else rectangle.left // TILESIZE
+        s_mid = rectangle.center_y // TILESIZE if horisontal else rectangle.center_x // TILESIZE
+        s_max = rectangle.bottom // TILESIZE if horisontal else rectangle.right // TILESIZE
+        s_positive = (s_mid - s_min) < (s_max - s_mid)
+        secondary_incr = 1 if s_positive else -1
+
+        first_secondary = s_min if s_positive else s_max
+        last_secondary = s_max if s_positive else s_min
+
         collision_tiles = []
-        for row in range(int(first_row), int(last_row) + 1):  # TODO: check if we need there +1
-            for col in range(int(first_col), int(last_col) + 1):
+        for primary in range(int(first_primary), int(last_primary + primary_incr), int(primary_incr)):
+            for secondary in range(int(first_secondary), int(last_secondary + secondary_incr), int(secondary_incr)):
                 try:  # all of maps need to be closed, character shouldn't fall outside of map
-                    collision_tiles.append(CollisionTile(self.tiles[row][col].type, row, col))
+                    row = primary if not horisontal else secondary
+                    col = primary if horisontal else secondary
+                    collision_tiles.append(CollisionTile(self.tiles[row][col].type,
+                                                         row, col, self.tiles[row][col].slope_type))
                 except IndexError as ie:
                     print(ie)
         return collision_tiles
