@@ -5,6 +5,7 @@ import os
 TILESIZE = 32
 FPS = 60
 resolution = WIDTH, HEIGHT = 640, 480
+SOUND_ON = True
 
 
 class AnimatedSprite(pygame.sprite.Sprite):

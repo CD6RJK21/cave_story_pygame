@@ -5,8 +5,9 @@ from graphics import *
 def main_menu(screen):
     songs = ['data/music/curly.mp3']
     title_image = load_image('title.png')
-    move_sound = pygame.mixer.Sound('data/sound/menu_move.wav')
-    prompt_sound = pygame.mixer.Sound('data/sound/menu_prompt.wav')
+    if SOUND_ON:
+        move_sound = pygame.mixer.Sound('data/sound/menu_move.wav')
+        prompt_sound = pygame.mixer.Sound('data/sound/menu_prompt.wav')
     running = True
     menu_sprites = pygame.sprite.Group()
     title = pygame.sprite.Sprite(menu_sprites)
@@ -30,8 +31,9 @@ def main_menu(screen):
     player_right.rect.x = new_game.rect.x - player_right.rect.width
     player_right.rect.y = new_game.rect.y - 0.25 * player_right.rect.height
     active_button = 'new'
-    pygame.mixer.music.load(songs[0])
-    pygame.mixer.music.play(-1)
+    if SOUND_ON:
+        pygame.mixer.music.load(songs[0])
+        pygame.mixer.music.play(-1)
     while running:
         screen.fill((50, 51, 50))
         for event in pygame.event.get():
@@ -42,39 +44,44 @@ def main_menu(screen):
                     running = False  # TODO: fix game start
                 elif event.key == pygame.K_DOWN:
                     if active_button == 'new':
-                        move_sound.play()
+                        if SOUND_ON:
+                            move_sound.play()
                         active_button = 'load'
                         player_right.rect.y = load_game.rect.y - 0.25 * player_right.rect.height
                     else:
-                        move_sound.play()
+                        if SOUND_ON:
+                            move_sound.play()
                         active_button = 'new'
                         player_right.rect.y = new_game.rect.y - 0.25 * player_right.rect.height
                 elif event.key == pygame.K_UP:
                     if active_button == 'load':
-                        move_sound.play()
+                        if SOUND_ON:
+                            move_sound.play()
                         active_button = 'new'
                         player_right.rect.y = new_game.rect.y - 0.25 * player_right.rect.height
                     else:
-                        move_sound.play()
+                        if SOUND_ON:
+                            move_sound.play()
                         active_button = 'load'
                         player_right.rect.y = load_game.rect.y - 0.25 * player_right.rect.height
         menu_sprites.update()
         menu_sprites.draw(screen)
         clock.tick(60)
         pygame.display.flip()
-    pygame.mixer.music.stop()
+    # pygame.mixer.music.stop()
     if active_button == 'new':
-        prompt_sound.play()
+        # prompt_sound.play()
         return 'new'
     elif active_button == 'load':
-        prompt_sound.play()
+        # prompt_sound.play()
         return 'load'
 
 
 def quit_menu(screen, resolution, groups):
     clock = pygame.time.Clock()
-    move_sound = pygame.mixer.Sound('data/sound/menu_move.wav')
-    prompt_sound = pygame.mixer.Sound('data/sound/menu_prompt.wav')
+    if SOUND_ON:
+        move_sound = pygame.mixer.Sound('data/sound/menu_move.wav')
+        prompt_sound = pygame.mixer.Sound('data/sound/menu_prompt.wav')
     dialog_window_group = pygame.sprite.Group()
     dialog_window = pygame.sprite.Sprite(dialog_window_group)
     dialog_window.image = cut_image_one(load_image('TextBox.png'), (310, 102), (463, 153))
@@ -103,17 +110,21 @@ def quit_menu(screen, resolution, groups):
                         runn = False
                 elif event.key == pygame.K_LEFT:
                     if active_button == 'no':
-                        move_sound.play()
+                        if SOUND_ON:
+                            move_sound.play()
                         active_button = 'yes'
                     else:
-                        move_sound.play()
+                        if SOUND_ON:
+                            move_sound.play()
                         active_button = 'no'
                 elif event.key == pygame.K_RIGHT:
                     if active_button == 'yes':
-                        move_sound.play()
+                        if SOUND_ON:
+                            move_sound.play()
                         active_button = 'no'
                     else:
-                        move_sound.play()
+                        if SOUND_ON:
+                            move_sound.play()
                         active_button = 'yes'
         if not slide:
             dialog_window.rect.x -= 5
@@ -131,7 +142,8 @@ def quit_menu(screen, resolution, groups):
         arrow_group.draw(screen)
         clock.tick(FPS)
         pygame.display.flip()
-    prompt_sound.play()
+    if SOUND_ON:
+        prompt_sound.play()
 
 
 def loading_screen(screen):

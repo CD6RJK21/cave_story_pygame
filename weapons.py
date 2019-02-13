@@ -6,9 +6,10 @@ GUNHEIGHT = TILESIZE
 
 class PolarStar:
     def __init__(self):
-        self.sound = {'polar_star_l1_2': pygame.mixer.Sound('data/sound/polar_star_l1_2.wav'),
-                      'polar_star_l3': pygame.mixer.Sound('data/sound/polar_star_l3.wav')
-                      }
+        if SOUND_ON:
+            self.sound = {'polar_star_l1_2': pygame.mixer.Sound('data/sound/polar_star_l1_2.wav'),
+                        'polar_star_l3': pygame.mixer.Sound('data/sound/polar_star_l3.wav')
+                        }
         self.offsets = {'up': 2, 'down': 4, 'fwd': 0, 'left': 0, 'right': 1}
         self.sprite_group = pygame.sprite.Group()
         self.sprite = pygame.sprite.Sprite(self.sprite_group)
@@ -115,7 +116,8 @@ class PolarStar:
                 self.kill()
 
     def start_fire(self, x, y, direction, look, motion):
-        self.sound['polar_star_l1_2'].play()
+        if SOUND_ON:
+            self.sound['polar_star_l1_2'].play()
         bullet_y = self.gun_y(look, y) - TILESIZE / 2
         bullet_x = self.gun_x(direction, x) - TILESIZE / 2
         if look == 'fwd':

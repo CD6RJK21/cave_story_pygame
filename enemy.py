@@ -6,7 +6,8 @@ class FirstCaveBat(pygame.sprite.Sprite):
     def __init__(self, group, x, y):
         super().__init__(group)
         self.image_file = load_image('bat.png')
-        self.sound = {'enemy_hurt_cool': pygame.mixer.Sound('data/sound/enemy_hurt_cool.wav')}
+        if SOUND_ON:
+            self.sound = {'enemy_hurt_cool': pygame.mixer.Sound('data/sound/enemy_hurt_cool.wav')}
         self.x = x
         self.y = y
         self.update_time = 3
@@ -30,7 +31,8 @@ class FirstCaveBat(pygame.sprite.Sprite):
 
 
     def take_damage(self, damage):
-        self.sound['enemy_hurt_cool'].play()
+        if SOUND_ON:
+            self.sound['enemy_hurt_cool'].play()
         self.health_current -= damage
 
     def damage_rectangle(self):

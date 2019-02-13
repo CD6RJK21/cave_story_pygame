@@ -33,8 +33,10 @@ all_sprites.add(*maap.backdrop_group.sprites(), *maap.foreground_group.sprites()
                 *player.health_number_group.sprites())
 
 running = True
-pygame.mixer.music.load('data/music/gestation.mp3')  # TODO: down the music volume
-pygame.mixer.music.play(-1)
+if SOUND_ON:
+    pygame.mixer.music.load('data/music/gestation.mp3')  # TODO: down the music volume
+    pygame.mixer.music.set_volume(0.7)
+    pygame.mixer.music.play(-1)
 while running:
     screen.fill((0, 0, 0))
     for event in pygame.event.get():
@@ -43,7 +45,7 @@ while running:
         if event.type == pygame.KEYDOWN:
             pressed = pygame.key.get_pressed()
             if pressed[pygame.K_F4] and pressed[pygame.K_LALT]:
-                exit()  # TODO: make exit dialog window
+                exit()
             if event.key == pygame.K_ESCAPE:
                 quit_menu(screen, resolution, all_sprites)
                 continue
