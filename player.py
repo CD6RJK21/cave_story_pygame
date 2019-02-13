@@ -6,11 +6,12 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, pos):
         self.player_group = pygame.sprite.Group()
         super().__init__(self.player_group)
-        # # self.sound = {'running': pygame.mixer.Sound('data/sound/quote_walk.wav'),
-        #               'head_bump': pygame.mixer.Sound('data/sound/quote_bonkhead.wav'),
-        #               'jumping': pygame.mixer.Sound('data/sound/quote_jump.wav'),
-        #               'quote_hurt': pygame.mixer.Sound('data/sound/quote_hurt.wav')
-        #               }
+        if SOUND_ON:
+            self.sound = {'running': pygame.mixer.Sound('data/sound/quote_walk.wav'),
+                        'head_bump': pygame.mixer.Sound('data/sound/quote_bonkhead.wav'),
+                        'jumping': pygame.mixer.Sound('data/sound/quote_jump.wav'),
+                        'quote_hurt': pygame.mixer.Sound('data/sound/quote_hurt.wav')
+                        }
         self.rectangle_x = Rectangle(6, 10, 20, 12)
         self.rectangle_y = Rectangle(10, 2, 12, 30)
 
@@ -178,12 +179,14 @@ class Player(pygame.sprite.Sprite):
 
             info = self.collision_info(maap, self.top_collision(0), 'top')
             if info['collided']:
-                # self.sound['head_bump'].play()
+                if SOUND_ON:
+                    self.sound['head_bump'].play()
                 self.rect.y = info['row'] * TILESIZE + self.rectangle_y.height
         elif delta < 0:
             info = self.collision_info(maap, self.top_collision(delta), 'top')
             if info['collided']:
-                # self.sound['head_bump'].play()
+                if SOUND_ON:
+                    self.sound['head_bump'].play()
                 self.rect.y = info['row'] * TILESIZE + TILESIZE + self.rectangle_y.top
                 self.speed_y = 0
             else:
@@ -291,7 +294,8 @@ class Player(pygame.sprite.Sprite):
         self.interacting = False
         self.jump_active = True
         if self.on_ground:
-            # self.sound['jumping'].play()
+            if SOUND_ON:
+                self.sound['jumping'].play()
 
             self.speed_y = -self.jump_speed
             self.motion = 'jumping'
@@ -303,7 +307,8 @@ class Player(pygame.sprite.Sprite):
         if self.invincible:
             return
         # self.dead = self.health_current > 0
-        # self.sound['quote_hurt'].play()
+        if SOUND_ON:
+            self.sound['quote_hurt'].play()
         self.speed_y = min(-self.shortjump_speed, self.speed_y)
         self.damage = damage
         self.damage_time = 0
@@ -367,8 +372,9 @@ class Player(pygame.sprite.Sprite):
         if len(self.frames) > 1:
             self.time += 1
             if self.time >= self.update_time:
-                # if self.motion == 'running':
-                    # self.sound['running'].play()
+                if SOUND_ON:
+                    if self.motion == 'running':
+                        self.sound['running'].play()
                 self.cur_frame = (self.cur_frame + 1) % len(self.frames)
                 self.image = self.frames[self.cur_frame]
                 self.time = 0
